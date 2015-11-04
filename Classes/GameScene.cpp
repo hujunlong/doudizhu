@@ -1,0 +1,22 @@
+#include "GameScene.h"
+
+GameScene::GameScene(){
+	this->gameLayer = NULL;
+};
+
+GameScene::~GameScene(){
+
+};
+
+bool GameScene::init(){
+	if(!Scene::init()){
+		return false;
+	}
+	gameLayer = GameLayer::create();
+	if(gameLayer == NULL){
+		return false;
+	}
+	this->addChild(gameLayer);
+
+	return true;
+}

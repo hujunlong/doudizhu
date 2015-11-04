@@ -1,0 +1,32 @@
+﻿<dict>  
+    <key>dizhu</key>  
+    <string>地主</string>
+
+    <key>yifen</key>  
+    <string>1分</string>   
+
+    <key>erfen</key>  
+    <string>2分</string>
+
+    <key>sanfen</key>  
+    <string>3分</string>    
+
+    <key>bujiao</key>  
+    <string>不叫</string>   
+
+    <key>buchu</key>  
+    <string>不出</string>   
+
+    <key>chupai</key>  
+    <string>出牌</string>  
+
+    <key>youwin</key>  
+    <string>你赢了!!点击重新开始!!</string>  
+
+    <key>youlost</key>  
+    <string>你输了!!点击重新开始!!</string> 
+
+    <key>youwin</key>  
+    <string>你赢了!!点击重新开始!!</string>   
+</dict>  
+</plist>  
