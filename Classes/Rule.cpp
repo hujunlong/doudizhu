@@ -12,8 +12,8 @@ Rule::~Rule(){
 void Rule::InitPks(){
 	for (int i=0;i<4;++i){
 		for (int j=0;j<13;++j){
-			pks[i*j+j].pk_type = i;
-			pks[i*j+j].pk_num = j;
+			pks[i*13+j].pk_type = i;
+			pks[i*13+j].pk_num = j;
 		}
 	}
 

@@ -6,7 +6,8 @@ const int pkWidth = 71;//牌的宽度
 const int pkHeight = 96;//牌的高度
 const int pkDistance = 20;//牌与牌的间距
 const int pkTopHeight = 10;//牌点击向上移动距离
-
+const int menu_score_top = 88;//叫分向上位置高度
+const int menu_score_distance = 20;//叫分间距
 //花色
 enum PKType
 {
@@ -24,7 +25,7 @@ enum PKNum {
 };
 
 enum Table {
-	score,
+	PlayerScore,
 	NpcOneNotPlay,
 	NpcTwoNotPlay
 };
@@ -58,6 +59,12 @@ enum PLAYER_HANDLE_TYPE ////玩家种类:0为玩家用于的牌，1为电脑有，2为显示的三张牌
 };
 
 
+enum SCORE{
+	score_zero,
+	score_one ,
+	score_two,
+	score_three
+};
 struct AIR_ADD_CARD_TYPE //飞机带牌
 {
 	std::vector<int> single_card;//单牌
