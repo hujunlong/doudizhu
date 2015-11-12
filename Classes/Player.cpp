@@ -26,8 +26,8 @@ void Player::updatePkPosion(){ //Íæ¼ÒÖÖÀà:0ÎªÍæ¼Ò£¬1ÎªµçÄÔ£¬2ÎªÏÔÊ¾µÄÈıÕÅÅÆ,3ÎªÍ
 	}
 
 	//¶ÔÅÆ½øĞĞÅÅĞò
-	if (m_HandleType != PLAYER_HAND_PK && m_HandleType != COMPUTER_1_HANDLE_PK && m_HandleType != COMPUTER_2_HANDLE_PK ){
-		for (int i=0;i<m_arrPk->count()!=0 && m_arrPk->count()-1;++i){
+	if (m_HandleType == PLAYER_ARRAY_PK || m_HandleType == COMPUTER_ARRAY_PK || m_HandleType == THREE_PK){
+		for (int i=0; i<m_arrPk->count()!=0 && i<(m_arrPk->count()-1); ++i){
 			for (int j=0;j<m_arrPk->count()-1-i;++j){
 				Poker* pk1 = (Poker*)m_arrPk->objectAtIndex(j);
 				Poker* pk2 = (Poker*)m_arrPk->objectAtIndex(j+1);
@@ -37,6 +37,12 @@ void Player::updatePkPosion(){ //Íæ¼ÒÖÖÀà:0ÎªÍæ¼Ò£¬1ÎªµçÄÔ£¬2ÎªÏÔÊ¾µÄÈıÕÅÅÆ,3ÎªÍ
 		}
 	}
 
+	int count = m_arrPk->count();
+	for (int i=0;i<count;i++)
+	{
+		Poker* pk1 = (Poker*)m_arrPk->objectAtIndex(i);
+		CCLog("pk1->getPkNum() = %d",pk1->getPkNum());
+	}
 	//¸üĞÂÎ»ÖÃ
 	int index = 0;
 	CCObject* object;

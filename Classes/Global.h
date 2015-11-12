@@ -25,7 +25,7 @@ enum PKNum {
 };
 
 enum Table {
-	PlayerScore,
+	Score,
 	NpcOneNotPlay,
 	NpcTwoNotPlay
 };
@@ -71,4 +71,10 @@ struct AIR_ADD_CARD_TYPE //飞机带牌
 	std::vector<int> double_card;//双牌
 	std::vector<int> three_card;//三张
 	std::vector<int> four_card;//四张
+};
+
+struct StructCallPk
+{
+	int People;
+	int CallScore;
 };

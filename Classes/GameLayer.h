@@ -35,6 +35,9 @@ public:
 	void func(CCNode* pSender, void* pData);
 	void update(float delta);
 	void playerPkCanClick();
+	void Call(float dt);//叫地主
+	void NpcCall(Player* npc,int index);//电脑叫牌
+	void GiveDiZhuThreePk();//给地主三张牌
 private: 
 	 CCArray* m_arrPokers;//所以的牌
 	 CC_SYNTHESIZE(CCArray*,m_arrayPlayerOut,ArrayPlayerOut);//玩家要出的牌
@@ -47,9 +50,9 @@ private:
 	 Player* m_npcTwoOut;//电脑2出的牌
 
 	 Rule rule;//牌规则
-	 bool m_isCall[3];//分数叫牌
+	 //bool m_isCall[3];//分数叫牌
+	 StructCallPk m_call;//分数叫牌 (0 1 2:玩家 电脑1 电脑2)
 	 int m_callTime;//轮流叫地主
-	 Dictionary* strings;//读取配置
 	 int m_outPk;//该某人出牌
 	 CCArray* m_arrFollowPk;//要跟的牌
 

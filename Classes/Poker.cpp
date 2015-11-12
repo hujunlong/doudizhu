@@ -86,6 +86,7 @@ Poker* Poker::copy(){
 	pk->m_isClick = this->m_isClick;
 	pk->m_isSelect = this->m_isSelect;
 	pk->setPkType(this->getPkType());
+	pk->setPkNum(this->getPkNum());
 	pk->m_gameMain = this->m_gameMain;
 	return pk;
 }

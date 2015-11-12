@@ -8,14 +8,21 @@ GameLayer::GameLayer():m_callTime(0),m_outPk(0){
 	m_npcOne = new Player();
 	m_npcTwo = new Player();
 	m_Three = new Player();
+	m_playerOut = new Player();
 	m_npcOneOut = new Player();
 	m_npcTwoOut = new Player();
-	for(int i=0; i<3; ++i)
-		m_isCall[i] = false; 
 
-	strings = Dictionary::createWithContentsOfFile("strings.xml");
+	m_arrayPlayerOut = CCArray::create();
+	m_arrayPlayerOut->retain();
+
+	m_call.People = 0;
+	m_call.CallScore = 0;
+
 	m_state = 0;
 	m_sendPk_num = 0;
+
+	srand ((unsigned)time(nullptr));
+	m_callTime = rand()%3;
 }
 
 GameLayer::~GameLayer(){
@@ -24,6 +31,7 @@ GameLayer::~GameLayer(){
 	 CC_SAFE_RELEASE(m_npcOne);
 	 CC_SAFE_RELEASE(m_npcTwo);
 	 CC_SAFE_RELEASE(m_Three);
+	 CC_SAFE_RELEASE(m_playerOut);
 	 CC_SAFE_RELEASE(m_npcOneOut);
 	 CC_SAFE_RELEASE(m_npcTwoOut);
 }
@@ -32,8 +40,6 @@ bool GameLayer::init(){
 	if(!Layer::init()){
 		return false;
 	}
-
-	srand((unsigned)time(NULL));
 	do 
 	{
 		CC_BREAK_IF(!initBackGround());
@@ -105,11 +111,11 @@ bool GameLayer::initPlayer(){
 	m_player->setHandleType(PLAYER_ARRAY_PK);
 
 	//设置npc1
-	m_npcOne->setStartLocation(ccp(65,504));
+	m_npcOne->setStartLocation(ccp(735,504));
 	m_npcOne->setHandleType(COMPUTER_ARRAY_PK);
 
 	//设置npc2
-	m_npcTwo->setStartLocation(ccp(735,504));
+	m_npcTwo->setStartLocation(ccp(65,504));
 	m_npcTwo->setHandleType(COMPUTER_ARRAY_PK);
 
 	//设置3张牌
@@ -117,8 +123,8 @@ bool GameLayer::initPlayer(){
 	m_Three->setHandleType(THREE_PK);
 
 	//主玩家出牌位置
-	m_player->setStartLocation(ccp(size.width/2,size.height/6+106));
-	m_player->setHandleType(PLAYER_HAND_PK);
+	m_playerOut->setStartLocation(ccp(size.width/2,size.height/6+106));
+	m_playerOut->setHandleType(PLAYER_HAND_PK);
 
 	//NPC1 出牌位置
 	m_npcOneOut->setStartLocation(ccp(146,size.height/2+20));
@@ -133,6 +139,7 @@ bool GameLayer::initPlayer(){
 
 void GameLayer::ShowScore(CCPoint pt,int score){
 	const char *score_str;
+	Dictionary* strings = Dictionary::createWithContentsOfFile("strings.xml");
 	if (score == score_zero)
 		score_str  = ((String*)strings->objectForKey("bujiao"))->getCString();
 	if (score == score_one)
@@ -145,61 +152,81 @@ void GameLayer::ShowScore(CCPoint pt,int score){
 	CCLabelTTF* showScore = CCLabelTTF::create(score_str,"Helvetica-BoldOblique",20);
 	showScore->setPosition(ccp(pt.x,pt.y));
 	showScore->setAnchorPoint(ccp(0.5,0.5));
-	this->addChild(showScore,1,PlayerScore);
+	this->addChild(showScore,1,Score);
 }
 
  
 void GameLayer::menuCallBackOneScore(CCObject* sender){
+	if (m_call.CallScore >= 1){
+		++m_callTime;
+		m_player->setCall(true);
+		return;
+	}
 	m_player->setCallScore(score_one);
 	m_player->setCall(true);
 	//m_isCall[0] = true;
-	//++m_callTime;
+	m_call.People = 0;
+	m_call.CallScore = 1;
+	++m_callTime;
 	 
 	CCSize size = CCDirector::sharedDirector()->getVisibleSize();
 	ShowScore(CCPoint(size.width/2,m_player->getStartLocation().y+menu_score_top),score_one);
 	CCMenuItemFont* font = (CCMenuItemFont*) sender;
-	font->getParent()->setVisible(true);
+	font->getParent()->setVisible(false);
 	 
 }
  
 
 
 void GameLayer::menuCallBackTwoScore(CCObject* sender){
+	if (m_call.CallScore >= 2){
+		++m_callTime;
+		m_player->setCall(true);
+		return;
+	}
+
 	m_player->setCallScore(score_two);
 	m_player->setCall(true);
-	//m_isCall[1] = true;
-	//++m_callTime;
+	m_call.People = 0;
+	m_call.CallScore = 2;
+	++m_callTime;
  
 	CCSize size = CCDirector::sharedDirector()->getVisibleSize();
 	ShowScore(CCPoint(size.width/2,m_player->getStartLocation().y+menu_score_top),score_two);
 	CCMenuItemFont* font = (CCMenuItemFont*) sender;
-	font->getParent()->setVisible(true);
+	font->getParent()->setVisible(false);
  
 }
 
 
 void GameLayer::menuCallBackThreeScore(CCObject* sender){
+	if (m_call.CallScore >= 3){
+		++m_callTime;
+		m_player->setCall(true);
+		return;
+	}
+
 	m_player->setCallScore(score_three);
 	m_player->setCall(true);
 	m_npcOne->setCall(true);
 	m_npcTwo->setCall(true);
- 
-	//m_isCall[2] = true;
-	//++m_callTime;
+	m_call.People = 0;
+	m_call.CallScore = 3;
+	++m_callTime;
 	CCSize size = CCDirector::sharedDirector()->getVisibleSize();
 	ShowScore(CCPoint(size.width/2,m_player->getStartLocation().y+menu_score_top),score_three);
 	CCMenuItemFont* font = (CCMenuItemFont*) sender;
-	font->getParent()->setVisible(true);
+	font->getParent()->setVisible(false);
 }
 
 void GameLayer::menuCallDiZhu(CCObject* sender){
 	m_player->setCallScore(score_zero);
 	m_player->setCall(true);
-	//++m_callTime;
+	++m_callTime;
 	CCSize size = CCDirector::sharedDirector()->getVisibleSize();
 	ShowScore(CCPoint(size.width/2,m_player->getStartLocation().y+menu_score_top),0);
 	CCMenuItemFont* font = (CCMenuItemFont*) sender;
-	font->getParent()->setVisible(true);
+	font->getParent()->setVisible(false);
 }
 
 void GameLayer::menuNotHandle(CCObject* sender){
@@ -259,7 +286,7 @@ void GameLayer::menuSuccess(CCObject* sender){
 bool GameLayer::initButton(){
 	Size size = Director::sharedDirector()->getVisibleSize();
 	const char *tip;
-
+	Dictionary* strings = Dictionary::createWithContentsOfFile("strings.xml");
 	//1分
 	tip = ((String *)strings->objectForKey("yifen"))->getCString();
 	MenuItemFont *menu_one = MenuItemFont::create(tip,this,menu_selector(GameLayer::menuCallBackOneScore));
@@ -274,7 +301,6 @@ bool GameLayer::initButton(){
 	MenuItemFont* menu_two = MenuItemFont::create(tip,this,menu_selector(GameLayer::menuCallBackTwoScore));
 	menu_two->setAnchorPoint(ccp(0,0.5));
 	menu_two->setPosition(ccp(x+fontWidth.width*1+menu_score_distance,y));
-
 
 	//三分
 	tip = ((String *)strings->objectForKey("sanfen"))->getCString();
@@ -307,7 +333,7 @@ bool GameLayer::initButton(){
 
 	//出牌
 	tip = ((String*)strings->objectForKey("chupai"))->getCString();
-	MenuItemFont* chuPai = MenuItemFont::create(tip,this,menu_selector(GameLayer::menuNotHandle));
+	MenuItemFont* chuPai = MenuItemFont::create(tip,this,menu_selector(GameLayer::menuHandle));
 	chuPai->setAnchorPoint(ccp(0,0.5));
 	chuPai->setPosition(ccp(x+fontWidth.width+20,y));
 
@@ -319,7 +345,6 @@ bool GameLayer::initButton(){
 	this->addChild(m_handle_menu,1000);
 	m_handle_menu->setVisible(false);
 
-
 	//胜利
 	tip = ((String *)strings->objectForKey("youwin"))->getCString();
 	MenuItemFont* menu_scucess = MenuItemFont::create(tip,this,menu_selector(GameLayer::menuSuccess));
@@ -330,7 +355,7 @@ bool GameLayer::initButton(){
 	m_success_menu->addChild(menu_scucess);
 	m_success_menu->setPosition(CCPointZero);
 	this->addChild(m_success_menu);
-	m_success_menu->setVisible(true);
+	m_success_menu->setVisible(false);
 
 	//你输了的按钮
 	tip = ((String *)strings->objectForKey("youlost"))->getCString();
@@ -342,7 +367,7 @@ bool GameLayer::initButton(){
 	m_lost_menu->addChild(lost);
 	m_lost_menu->setPosition(CCPointZero);
 	this->addChild(m_lost_menu);
-	m_lost_menu->setVisible(true);
+	m_lost_menu->setVisible(false);
 
  
 	//npctwo标签
@@ -393,9 +418,8 @@ void GameLayer::sendPk(){
 		++m_sendPk_num;
 	}
 
-	if (m_sendPk_num == 53)
-	{
-		playerPkCanClick();
+	if (m_sendPk_num > 53){
+		m_state = 1;
 	}
 }
 
@@ -420,11 +444,151 @@ void GameLayer::update(float delta){
 	{
 	case 0:
 		sendPk();
+		break;
 	case 1:
+		schedule(schedule_selector(GameLayer::Call),1);
+		break;
 	case 2:
 	case 3:
 
 	default:
 		break;
 	}
+}
+
+//npc Call
+void GameLayer::NpcCall(Player* npc,int index){
+	int num = rule.Call(index);
+	if (m_call.CallScore < num){
+		npc->setCallScore(num);
+		m_call.CallScore = num;
+		m_call.People = index;
+	}	
+	else
+       npc->setCallScore(0);
+	npc->setCall(true);
+}
+
+void GameLayer::GiveDiZhuThreePk(){
+	CCPoint playerDiZhuLablePt = CCPointMake(100,100);
+	CCPoint npcOneDiZhuLablePt = CCPointMake(65+100,504);
+	CCPoint npcTwoDiZhuLablePt = CCPointMake(735-100,504);
+
+	CCObject* object;
+	CCARRAY_FOREACH(m_Three->getArrPK(),object){
+		Poker* pk = (Poker *)object;
+		Poker* pkCopy = pk->copy();
+
+		if (m_call.People == 0){
+			m_player->getArrPK()->addObject(pkCopy);
+		}else if (m_call.People == 1){
+			m_npcOne->getArrPK()->addObject(pkCopy);
+		}else{
+			m_npcTwo->getArrPK()->addObject(pkCopy);
+		}
+		pk->showFront();
+	}
+	m_Three->updatePkPosion();
+
+	//显示地主标签
+	switch (m_call.People)
+	{
+	case 0:
+		m_lableDiZhu->setPosition(playerDiZhuLablePt);
+		m_player->updatePkPosion();
+		m_player->setIsDiZhu(true);
+		m_npcOne->setIsDiZhu(false);
+		m_npcTwo->setIsDiZhu(false);
+		m_outPk = 0;
+		break;
+	case 1:
+		m_lableDiZhu->setPosition(npcOneDiZhuLablePt);
+		m_npcOne->updatePkPosion();
+		m_player->setIsDiZhu(false);
+		m_npcOne->setIsDiZhu(true);
+		m_npcTwo->setIsDiZhu(false);
+		m_outPk = 1;
+		break;
+	case 2:
+		m_lableDiZhu->setPosition(npcTwoDiZhuLablePt);
+		m_npcTwo->updatePkPosion();
+		m_player->setIsDiZhu(false);
+		m_npcOne->setIsDiZhu(false);
+		m_npcTwo->setIsDiZhu(true);
+		m_outPk = 2;
+		break;
+	default:
+		break;
+	}
+	
+	//主玩家牌可点击
+	playerPkCanClick();
+	m_state = 2;
+	this->unschedule(schedule_selector(GameLayer::Call));
+	m_lableDiZhu->setVisible(true);
+
+	//移除叫分
+	this->removeChildByTag(Score);
+}
+
+//叫地主
+void GameLayer::Call(float dt){
+	m_callTime = m_callTime%3;
+	if (m_call.CallScore >=3 )//已经叫地主了
+	{
+		GiveDiZhuThreePk();
+		return;
+	}
+
+	if (!m_player->getCall() || !m_npcOne->getCall() || !m_npcTwo->getCall()){
+		switch (m_callTime){
+		case 0:
+			m_menu->setVisible(true);
+
+			if (m_call.CallScore < 1){
+				CCMenuItemFont* itemFont = (CCMenuItemFont*)m_menu->getChildByTag(score_one);
+				itemFont->setEnabled(true);
+				return;
+			}
+
+			if (m_call.CallScore > 1 && m_call.CallScore <= 2){
+				CCMenuItemFont* itemFont = (CCMenuItemFont*)m_menu->getChildByTag(score_two);
+				itemFont->setEnabled(true);
+				CCMenuItemFont* buff_itemFont = (CCMenuItemFont*)m_menu->getChildByTag(score_one);
+				buff_itemFont->setEnabled(false);
+				return;
+			} 
+
+			if (m_call.CallScore >= 2 && m_call.CallScore < 3){
+				CCMenuItemFont* itemFont = (CCMenuItemFont*)m_menu->getChildByTag(score_three);
+				itemFont->setEnabled(true);
+
+				CCMenuItemFont* buff_itemFont1 = (CCMenuItemFont*)m_menu->getChildByTag(score_one);
+				buff_itemFont1->setEnabled(false);
+
+				CCMenuItemFont* buff_itemFont2 = (CCMenuItemFont*)m_menu->getChildByTag(score_two);
+				buff_itemFont2->setEnabled(false);
+			} 
+			break;
+		case 1:
+			++m_callTime;
+			NpcCall(m_npcOne,1);
+			ShowScore(ccp(m_npcOne->getStartLocation().x-88,m_npcOne->getStartLocation().y),m_npcOne->getCallScore());
+			break;
+
+		case 2:
+			++m_callTime;
+			NpcCall(m_npcTwo,2);
+			ShowScore(ccp(m_npcTwo->getStartLocation().x+88,m_npcTwo->getStartLocation().y),m_npcTwo->getCallScore());
+			break;
+		default:
+			break;
+		}
+	}else{
+		GiveDiZhuThreePk();
+		return;
+	}
+
+	 
+	 
 }
