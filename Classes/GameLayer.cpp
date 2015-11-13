@@ -149,10 +149,9 @@ void GameLayer::ShowScore(CCPoint pt,int score){
 	if (score == score_three)
 		score_str  = ((String*)strings->objectForKey("sanfen"))->getCString();
 
-	CCLabelTTF* showScore = CCLabelTTF::create(score_str,"Helvetica-BoldOblique",20);
+	showScore->setString(score_str);
 	showScore->setPosition(ccp(pt.x,pt.y));
 	showScore->setAnchorPoint(ccp(0.5,0.5));
-	this->addChild(showScore,1,Score);
 }
 
  
@@ -390,6 +389,10 @@ bool GameLayer::initButton(){
 	this->addChild(m_lableDiZhu,1);
 	m_lableDiZhu->setVisible(false);
 	
+
+	showScore = CCLabelTTF::create("","Helvetica-BoldOblique",20);
+	this->addChild(showScore,1,Score);
+
 	return true;
 }
 
@@ -419,7 +422,7 @@ void GameLayer::sendPk(){
 	}
 
 	if (m_sendPk_num > 53){
-		m_state = 1;
+		++m_state;
 	}
 }
 
@@ -449,6 +452,7 @@ void GameLayer::update(float delta){
 		schedule(schedule_selector(GameLayer::Call),1);
 		break;
 	case 2:
+		scheduleOnce(schedule_selector(GameLayer::OutPk),1);
 	case 3:
 
 	default:
@@ -471,16 +475,19 @@ void GameLayer::NpcCall(Player* npc,int index){
 
 void GameLayer::GiveDiZhuThreePk(){
 	CCPoint playerDiZhuLablePt = CCPointMake(100,100);
-	CCPoint npcOneDiZhuLablePt = CCPointMake(65+100,504);
-	CCPoint npcTwoDiZhuLablePt = CCPointMake(735-100,504);
-
+	CCPoint npcOneDiZhuLablePt = CCPointMake(735-100,504);
+	CCPoint npcTwoDiZhuLablePt = CCPointMake(65+100,504);
+	Size size = Director::sharedDirector()->getVisibleSize();
 	CCObject* object;
 	CCARRAY_FOREACH(m_Three->getArrPK(),object){
 		Poker* pk = (Poker *)object;
 		Poker* pkCopy = pk->copy();
+		pkCopy->setPosition(ccp(size.width/2,size.height/2));
+		
+		this->addChild(pkCopy);
 
 		if (m_call.People == 0){
-			m_player->getArrPK()->addObject(pkCopy);
+			m_player->getArrPK()->addObject(pkCopy);	
 		}else if (m_call.People == 1){
 			m_npcOne->getArrPK()->addObject(pkCopy);
 		}else{
@@ -489,7 +496,6 @@ void GameLayer::GiveDiZhuThreePk(){
 		pk->showFront();
 	}
 	m_Three->updatePkPosion();
-
 	//显示地主标签
 	switch (m_call.People)
 	{
@@ -523,12 +529,13 @@ void GameLayer::GiveDiZhuThreePk(){
 	
 	//主玩家牌可点击
 	playerPkCanClick();
-	m_state = 2;
 	this->unschedule(schedule_selector(GameLayer::Call));
 	m_lableDiZhu->setVisible(true);
 
 	//移除叫分
-	this->removeChildByTag(Score);
+	showScore->setString("");
+
+	++m_state;
 }
 
 //叫地主
@@ -575,7 +582,6 @@ void GameLayer::Call(float dt){
 			NpcCall(m_npcOne,1);
 			ShowScore(ccp(m_npcOne->getStartLocation().x-88,m_npcOne->getStartLocation().y),m_npcOne->getCallScore());
 			break;
-
 		case 2:
 			++m_callTime;
 			NpcCall(m_npcTwo,2);
@@ -587,8 +593,19 @@ void GameLayer::Call(float dt){
 	}else{
 		GiveDiZhuThreePk();
 		return;
-	}
+	} 
+}
 
-	 
-	 
+void GameLayer::OutPk(float delta){
+	switch (m_outPk%3){
+	case 0:
+		m_handle_menu->setVisible(true);
+		break;
+	case 1:
+		break;
+	case 2:
+		break;
+	default:
+		break;
+	}
 }

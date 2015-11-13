@@ -31,24 +31,24 @@ enum Table {
 };
 
 enum CARD_TYPE{
-	SINGLE_CARD = 1,		//单牌-
-	DOUBLE_CARD,			//对子-
-	THREE_CARD,				//3不带-
-	BOMB_CARD,				//炸弹
-	THREE_ONE_CARD,			//3带1-
-	THREE_TWO_CARD,			//3带2-
-	BOMB_TWO_CARD,			//四个带2张单牌
-	BOMB_DOUBLE_TWO_CARD,	//四个带2对
-	CONNECT_CARD,			//连牌-
-	COMPANY_CARD,			//连队-
-	AIRCRAFT_CARD,			//飞机不带-
-	AIRCRAFT_SINGLE_CARD,	//飞机带单牌-
-	AIRCRAFT_DOULBE_CARD,	//飞机带对子-
-	ERROR_CARD				//错误的牌型
+	PLANE_PK = 1,			//飞机
+	BOMB_PK,				//炸弹
+	SINGLE_PK,				//单牌
+	DOUBLE_PK,				//双牌
+	THREE_NO_ADD_PK,		//3不带
+	THREE_ONE_PK,			//3带1-
+	THREE_DOUBLE_PK,		//3带2-
+	SINGLE_SHUNZHI_PK,		//单连
+	DOUBLE_SHUNZHI_PK,      //双连
+	THREE_SHUNZHI_PK,       //三连
+	PLANE_ADD_WINGS_PK,		//飞机带翅膀
+	BOMB_TWO_PK,			//四个带2张单牌
+	BOMB_DOUBLE_TWO_PK,		//四个带2对
+	ERROR_PK				//错误的牌型
 };
 
 
-enum PLAYER_HANDLE_TYPE ////玩家种类:0为玩家用于的牌，1为电脑有，2为显示的三张牌,3为玩家要出的牌，4为电脑1要出的牌，5为电脑2要出的牌
+enum PLAYER_HANDLE_TYPE //玩家种类:0为玩家用于的牌，1为电脑有，2为显示的三张牌,3为玩家要出的牌，4为电脑1要出的牌，5为电脑2要出的牌
 {
 	PLAYER_ARRAY_PK = 0,
 	COMPUTER_ARRAY_PK,
@@ -78,3 +78,10 @@ struct StructCallPk
 	int People;
 	int CallScore;
 };
+
+struct PkStruct //牌 类型 大小
+{
+	int pk_type;
+	int pk_num;
+};
+

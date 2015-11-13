@@ -38,6 +38,7 @@ public:
 	void Call(float dt);//叫地主
 	void NpcCall(Player* npc,int index);//电脑叫牌
 	void GiveDiZhuThreePk();//给地主三张牌
+	void OutPk(float delta);
 private: 
 	 CCArray* m_arrPokers;//所以的牌
 	 CC_SYNTHESIZE(CCArray*,m_arrayPlayerOut,ArrayPlayerOut);//玩家要出的牌
@@ -55,13 +56,12 @@ private:
 	 int m_callTime;//轮流叫地主
 	 int m_outPk;//该某人出牌
 	 CCArray* m_arrFollowPk;//要跟的牌
-
 	 Menu* m_menu;//叫地主菜单
 	 Menu* m_handle_menu;//出牌菜单
 	 Menu* m_success_menu;//成功菜单
 	 Menu* m_lost_menu;//输了菜单
-
-	 CCLabelTTF* m_lableDiZhu;
-	 int m_state;
-	 int m_sendPk_num;
+	 CCLabelTTF* m_lableDiZhu;//地主标签
+	 CCLabelTTF* showScore;//显示叫牌分数
+	 int m_state;//状态 0 发牌 1选地主 2打牌
+	 int m_sendPk_num;//发牌 发了多少张了
 };

@@ -73,11 +73,9 @@ void Player::updatePkPosion(){ //Íæ¼ÒÖÖÀà:0ÎªÍæ¼Ò£¬1ÎªµçÄÔ£¬2ÎªÏÔÊ¾µÄÈýÕÅÅÆ,3ÎªÍ
 	int i=m_arrPk->count()-1;
 	CCARRAY_FOREACH(m_arrPk,object){
 		Poker* pk = (Poker*)object;
-
 		if (m_HandleType == COMPUTER_ARRAY_PK || m_HandleType == COMPUTER_1_HANDLE_PK || m_HandleType == COMPUTER_2_HANDLE_PK)
 			pk->setZOrder(size.height - pk->getPositionY());
 		if (m_HandleType == PLAYER_ARRAY_PK || m_HandleType == PLAYER_HAND_PK)
-			pk->setZOrder(pk->getPositionX());
-		 
+			pk->setZOrder(pk->getPositionX()); 
 	}
 }
