@@ -37,12 +37,12 @@ void Player::updatePkPosion(){ //Íæ¼ÒÖÖÀà:0ÎªÍæ¼Ò£¬1ÎªµçÄÔ£¬2ÎªÏÔÊ¾µÄÈıÕÅÅÆ,3ÎªÍ
 		}
 	}
 
-	int count = m_arrPk->count();
-	for (int i=0;i<count;i++)
-	{
-		Poker* pk1 = (Poker*)m_arrPk->objectAtIndex(i);
-		CCLog("pk1->getPkNum() = %d",pk1->getPkNum());
-	}
+// 	int count = m_arrPk->count();
+// 	for (int i=0;i<count;i++)
+// 	{
+// 		Poker* pk1 = (Poker*)m_arrPk->objectAtIndex(i);
+// 		CCLog("pk1->getPkNum() = %d",pk1->getPkNum());
+// 	}
 	//¸üĞÂÎ»ÖÃ
 	int index = 0;
 	CCObject* object;

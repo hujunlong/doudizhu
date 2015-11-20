@@ -44,6 +44,7 @@ private:
 	 CC_SYNTHESIZE(CCArray*,m_arrayPlayerOut,ArrayPlayerOut);//玩家要出的牌
 	 CC_SYNTHESIZE(Player*,m_playerOut,PlayerOut);//玩家出的牌
 	 CC_SYNTHESIZE(Player*,m_player,Player);//玩家
+
 	 Player* m_npcOne;//电脑1
 	 Player* m_npcTwo;//电脑2
 	 Player* m_Three;//显示三张剩余牌
@@ -51,7 +52,6 @@ private:
 	 Player* m_npcTwoOut;//电脑2出的牌
 
 	 Rule rule;//牌规则
-	 //bool m_isCall[3];//分数叫牌
 	 StructCallPk m_call;//分数叫牌 (0 1 2:玩家 电脑1 电脑2)
 	 int m_callTime;//轮流叫地主
 	 int m_outPk;//该某人出牌
@@ -64,4 +64,6 @@ private:
 	 CCLabelTTF* showScore;//显示叫牌分数
 	 int m_state;//状态 0 发牌 1选地主 2打牌
 	 int m_sendPk_num;//发牌 发了多少张了
+	 
+	 bool is_split[3];//
 };

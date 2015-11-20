@@ -1,5 +1,5 @@
 #include "Rule.h"
-#include <stdlib.h>
+#include <iostream>
 #include <ctime>
 
 Rule::Rule(){
@@ -9,6 +9,7 @@ Rule::Rule(){
 Rule::~Rule(){
 
 }
+
 void Rule::InitPks(){
 	for (int i=0;i<4;++i){
 		for (int j=0;j<13;++j){
@@ -24,7 +25,7 @@ void Rule::InitPks(){
 	pks[53].pk_num = RedJoker;
 }
 
-void Rule::Shuffle(){
+void Rule::Shuffle() {
 	srand(unsigned(time(0)));
 	for (int i=0;i<54;i++){
 		int a = rand()%54;
@@ -42,14 +43,44 @@ void Rule::Shuffle(){
 		buff.pk_type = pks[index].pk_type;
 		buff.pk_num = pks[index].pk_num;
 
-		if (witch_player == 0)
+		if (witch_player == 0){
 			pks_player.push_back(buff);
-		
-		if (witch_player == 1)
-			pks_npc1.push_back(buff);
+		}	
 
-		if (witch_player == 2)
+		if (witch_player == 1){
+			pks_npc1.push_back(buff);
+		}
+			
+		if (witch_player == 2){
 			pks_npc2.push_back(buff);
+		}	
+	}
+
+	pks_three.push_back( pks[51]);
+	pks_three.push_back( pks[52]);
+	pks_three.push_back( pks[53]);
+}
+
+void Rule::GiveDizhuPks(int type){
+	switch (type)
+	{
+		case 0:
+			 pks_player.push_back(pks_three[0]);
+			 pks_player.push_back(pks_three[1]);
+			 pks_player.push_back(pks_three[2]);
+			break;
+		case 1:
+			pks_npc1.push_back(pks_three[0]);
+			pks_npc1.push_back(pks_three[1]);
+			pks_npc1.push_back(pks_three[2]);
+			break;
+		case 2:
+			pks_npc2.push_back(pks_three[0]);
+			pks_npc2.push_back(pks_three[1]);
+			pks_npc2.push_back(pks_three[2]);
+			break;
+	default:
+		break;
 	}
 }
 
@@ -142,54 +173,95 @@ int Rule::Call(int index){ //叫地主规则 index 0,1,2 玩家 npc1,npc2
 	}
 
 	int total_score = plane_num*7 + bomb_num*6 + extra_num;
-	if (total_score >= 17)
+	if (total_score >= 7)
 		return double_three;
-	else if (total_score >= 15)
+	else if (total_score >= 5)
 		return double_two;
-	else if (total_score >= 13)
+	else if (total_score >= 3)
 		return double_one;
 	else
 	return 0;
 }
 
-void Rule::AiSplitPks(std::vector<PkStruct> &pks){ //0 1 2 玩家 npc1 npc2 
+void Rule::AiSplitPks(int type){ //0 1 2 玩家 npc1 npc2 
+
+	std::vector<PkStruct> my_pks;
+	switch (type)
+	{
+	case 0:
+		for (vector<PkStruct>::iterator iter=pks_player.begin();iter!=pks_player.end();iter++) {
+			my_pks.push_back(*iter);
+		}
+		break;
+	case 1:
+		for (vector<PkStruct>::iterator iter=pks_npc1.begin();iter!=pks_npc1.end();iter++) {
+			my_pks.push_back(*iter);
+		}
+		break;
+	case 2:
+		for (vector<PkStruct>::iterator iter=pks_npc2.begin();iter!=pks_npc2.end();iter++) {
+			my_pks.push_back(*iter);
+		}
+		break;
+	default:
+		break;
+	}
+
 	//排序
-	sort(pks.begin(),pks.end(),Rule::SelectShort);
-	PkHandleTypeStruct pk_handle_typestruct;
-	
+	sort(my_pks.begin(),my_pks.end(),Rule::SelectShort);
+	vector<PkHandleTypeStruct> vec_pk_handle_struct_;
 	//提取双王
-	if (pks[0].pk_type == Joker && pks[1].pk_type == Joker){	
+	if (my_pks[0].pk_type == Joker && my_pks[1].pk_type == Joker){	
+		 PkHandleTypeStruct pk_handle_typestruct;
 		 pk_handle_typestruct.type = PLANE_PK;
-		 pk_handle_typestruct.pk_structs.push_back(pks[0]);
-		 pk_handle_typestruct.pk_structs.push_back(pks[1]);
+		 pk_handle_typestruct.pk_structs.push_back(my_pks[0]);
+		 pk_handle_typestruct.pk_structs.push_back(my_pks[1]);
 		 vec_pk_hand_type_struct.push_back(pk_handle_typestruct);
+
+		 my_pks.erase(my_pks.begin());
+		 my_pks.erase(my_pks.begin());
 	}
 
 	//分析牌型
-	 vector<PkStruct>::iterator iter;  
-	 vector<PkStruct>::iterator iter_next;  
-	 std::vector<PkHandleTypeStruct> vec_pk_hand_type_struct_buff;
-	for (iter=pks.begin();iter!=pks.end();iter++) {
-		for (iter_next=iter; iter_next != pks.end();iter_next++){
+	vector<int> boom_score;
+	for (vector<PkStruct>::iterator iter=my_pks.begin();iter!=my_pks.end();iter++) {
+		PkHandleTypeStruct pk_handle_typestruct;
+		pk_handle_typestruct.pk_structs.push_back(*iter);
+		for (vector<PkStruct>::iterator iter_next = iter+1; iter_next != my_pks.end();iter_next++){
 			if (iter->pk_num == iter_next->pk_num){
-				++iter;
 				pk_handle_typestruct.pk_structs.push_back(*iter);
+				++iter;
+			}else{
+				break;
 			}
 		}
 
 		if (pk_handle_typestruct.pk_structs.size() == 4){//提取炸弹
 			pk_handle_typestruct.type = BOMB_PK;
 			vec_pk_hand_type_struct.push_back(pk_handle_typestruct);
+			boom_score.push_back(pk_handle_typestruct.pk_structs[0].pk_num);
 			break;
 		}
-		if (pk_handle_typestruct.pk_structs.size() == 3)
+
+		if (pk_handle_typestruct.pk_structs.size() == 3){ //提取三张
 			pk_handle_typestruct.type = THREE_NO_ADD_PK;
+			vec_pk_handle_struct_.push_back(pk_handle_typestruct);
+		}
 		if (pk_handle_typestruct.pk_structs.size() == 2)
 			pk_handle_typestruct.type = DOUBLE_PK;
 		if (pk_handle_typestruct.pk_structs.size() == 1)
 			pk_handle_typestruct.type = SINGLE_PK;
+	}
 
-		vec_pk_hand_type_struct_buff.push_back(pk_handle_typestruct);
+	//移除炸弹相关的牌
+	for (vector<PkStruct>::iterator iter=my_pks.begin();iter!=my_pks.end();iter++) {
+		for (std::vector<int>::iterator inter2=boom_score.begin();inter2!=boom_score.end();inter2++){
+			if (iter->pk_num == *inter2){
+				my_pks.erase(iter);
+				iter=my_pks.begin();
+				inter2=boom_score.begin();
+			}
+		}
 	}
 
 	//牌分类
@@ -202,41 +274,215 @@ void Rule::AiSplitPks(std::vector<PkStruct> &pks){ //0 1 2 玩家 npc1 npc2
 	//g) 再确定对子：在炸弹、三顺、三条、连牌、双顺以外的牌中检测是否存在对子，如果存在将其提取出来。
 	//h) 再确定单牌
 
-	AiThreePks(vec_pk_hand_type_struct_buff);
-	
+	std::vector<PkStruct> pks_erase_three = AiThreePks(vec_pk_handle_struct_,my_pks);//提取3个
 
+	std::vector<PkStruct> pks_erase_shunzi = AiSingleShunzhi(pks_erase_three);//提取连子
+
+	std::vector<PkStruct> pks_erase_double = AiDouble(pks_erase_shunzi);//提取对子
+
+	AiSingle(pks_erase_double);//单牌
 }
 
-//提取三顺 与 三个
-void Rule::AiThreePks(std::vector<PkHandleTypeStruct> vec_pk_hand_type_struct_buff){
-	vector<PkHandleTypeStruct> result;
-	vector<PkHandleTypeStruct>::iterator iter_pk_handle_strct; //提取三顺
-	std::vector<int> three_pk_vec;
+//提取三张一样的牌
+std::vector<PkStruct> Rule::AiThreePks(vector<PkHandleTypeStruct> vec_pk_handle_struct_,std::vector<PkStruct> &vec_pks){
+	if (vec_pk_handle_struct_.size() == 0)
+		return vec_pks;
+	if (vec_pk_handle_struct_.size() == 1)
+	{
+		vec_pk_hand_type_struct.push_back(vec_pk_handle_struct_[0]);
+	}
 	
+	//合并三顺
+	PkHandleTypeStruct pk_handle_type_struct_;
+	int oldScore = 0;
+	if (vec_pk_handle_struct_.size() >= 2){
+		 for (vector<PkHandleTypeStruct>::iterator iter = vec_pk_handle_struct_.begin();iter!= vec_pk_handle_struct_.end();iter++){
+			oldScore = iter->pk_structs[0].pk_num;
+			pk_handle_type_struct_= *iter;
+			for (vector<PkHandleTypeStruct>::iterator iter2 = iter+1;iter2!= vec_pk_handle_struct_.end();iter2++){
+				 if (oldScore-1 == iter2->pk_structs[0].pk_num){
+					 oldScore = iter2->pk_structs[0].pk_num;
+					 pk_handle_type_struct_.type = THREE_SHUNZHI_PK;
+					 for (int i=0;i<3;i++){
+						 pk_handle_type_struct_.pk_structs.push_back(iter2->pk_structs[i]);
+					 }
+					 ++iter;
+				 }
+			}
+			vec_pk_hand_type_struct.push_back(pk_handle_type_struct_);
+		 }
+	}
 
-	for (iter_pk_handle_strct = vec_pk_hand_type_struct_buff.begin();iter_pk_handle_strct != vec_pk_hand_type_struct_buff.end();iter_pk_handle_strct++){
-		if (iter_pk_handle_strct->type == THREE_NO_ADD_PK){
-			three_pk_vec.push_back(iter_pk_handle_strct->pk_structs[0].pk_num);
-			result.push_back(*iter_pk_handle_strct);
+	//移除三张牌
+	for (vector<PkStruct>::iterator inter = vec_pks.begin();inter != vec_pks.end();inter++){
+		for (vector<PkHandleTypeStruct>::iterator inter2 = vec_pk_handle_struct_.begin();inter2 != vec_pk_handle_struct_.end();inter2++){
+			if (inter->pk_num == inter2->pk_structs[0].pk_num){
+				vec_pks.erase(inter);
+				inter = vec_pks.begin();
+				inter2 = vec_pk_handle_struct_.begin();
+			}
 		}
 	}
 
-	PkHandleTypeStruct old_struct = *result.begin();
-	PkHandleTypeStruct end_struct = *result.end();  
-	for (iter_pk_handle_strct = (result.begin()+1);iter_pk_handle_strct != result.end();iter_pk_handle_strct++)
-	{   
-		if ( (iter_pk_handle_strct->pk_structs[0].pk_num != Er) && (old_struct.pk_structs[0].pk_num+1) == iter_pk_handle_strct->pk_structs[0].pk_num ){
-			old_struct.type = THREE_SHUNZHI_PK;
-			old_struct.pk_structs.push_back(iter_pk_handle_strct->pk_structs[0]);
-			old_struct.pk_structs.push_back(iter_pk_handle_strct->pk_structs[1]);
-			old_struct.pk_structs.push_back(iter_pk_handle_strct->pk_structs[2]);
-			 
-		}else{
-			vec_pk_hand_type_struct.push_back(old_struct);
-			if (end_struct.pk_structs[0].pk_num == iter_pk_handle_strct->pk_structs[0].pk_num){
-				vec_pk_hand_type_struct.push_back(end_struct);
+	return vec_pks;
+	
+}
+
+
+//提取顺子
+std::vector<PkStruct> Rule::AiSingleShunzhi(std::vector<PkStruct> &vec_pks){
+	vec_pks.clear();
+	PkStruct vec_pk;
+
+	if (vec_pks.size() < 5){
+		return vec_pks;
+	}
+
+	std::vector<PkHandleTypeStruct> vec_pk_hand_type_struct_;
+
+	//单顺提取
+	for (std::vector<PkStruct>::iterator inter = vec_pks.begin();inter!=vec_pks.end();inter++){
+		PkHandleTypeStruct result;
+		if (inter->pk_num == Er || inter->pk_type == Joker){
+			continue;
+		}
+
+		result.type = SINGLE_SHUNZHI_PK;
+		result.pk_structs.push_back(*inter);
+		int single_num = 1;
+
+		if (inter+1 != vec_pks.end()){
+			break;
+		}
+		for (std::vector<PkStruct>::iterator inter2 = inter+1;inter2!=vec_pks.end();++inter2){
+			if (inter2->pk_num == inter->pk_num){
+				++inter2;
+				++inter;
+			}
+
+			if ( (inter->pk_num)-1 == inter2->pk_num){
+				++inter;
+				++single_num;
+				result.pk_structs.push_back(*inter2);
+				if (single_num == 5){
+					vec_pk_hand_type_struct_.push_back(result);
+				}
+			}else {
+				break;
 			}
 		}
-		old_struct = *iter_pk_handle_strct;
+	}
+
+	//移除顺子中的牌
+	for (std::vector<PkStruct>::iterator inter = vec_pks.begin();inter!=vec_pks.end();inter++){
+		for (std::vector<PkHandleTypeStruct>::iterator inter2=vec_pk_hand_type_struct_.begin();inter2!=vec_pk_hand_type_struct_.end();inter2++){
+			for (std::vector<PkStruct>::iterator inter3 = inter2->pk_structs.begin();inter3 != inter2->pk_structs.end();inter3++){
+				if (inter->pk_num == inter3->pk_num && inter->pk_type == inter3->pk_type){
+					vec_pks.erase(inter);
+					inter = vec_pks.begin();
+					inter2=vec_pk_hand_type_struct_.begin();
+					inter3 = inter2->pk_structs.begin();
+				}
+			}
+		}
+	}
+
+	//扩展顺子
+	for (std::vector<PkStruct>::iterator inter = vec_pks.begin();inter!=vec_pks.end();inter++){
+		bool is_add_extra = false;
+		sort(pks_npc1.begin(),pks_npc1.end(),Rule::SelectShort);
+
+		if (inter->pk_num == Er || inter->pk_type == Joker){
+			continue;
+		}
+
+		for (std::vector<PkHandleTypeStruct>::iterator inter2=vec_pk_hand_type_struct_.begin();inter2!=vec_pk_hand_type_struct_.end();inter2++){
+			if (inter->pk_num-1 == inter2->pk_structs[0].pk_num){//扩展左边
+				inter2->pk_structs.insert(inter2->pk_structs.begin(),*inter);
+				is_add_extra = true;
+				break;
+			}
+
+			int len = inter2->pk_structs.size();
+			if (inter->pk_num+1 == inter2->pk_structs[len-1].pk_num){ //扩展右边
+				inter2->pk_structs.push_back(*inter);
+				is_add_extra = true;
+				break;
+			}
+		} 
+
+
+		if (is_add_extra)//重置迭代器
+		{
+			vec_pks.erase(inter);
+			inter = vec_pks.begin();
+		}
+	}
+
+	//合并顺子
+	if (vec_pk_hand_type_struct_.size() == 2){
+		if (vec_pk_hand_type_struct_[0].pk_structs.size() == vec_pk_hand_type_struct_[1].pk_structs.size())
+		{
+			int len = vec_pk_hand_type_struct_[0].pk_structs.size();
+			if ( vec_pk_hand_type_struct_[0].pk_structs[0].pk_num == vec_pk_hand_type_struct_[1].pk_structs[0].pk_num  && vec_pk_hand_type_struct_[0].pk_structs[len-1].pk_num == vec_pk_hand_type_struct_[1].pk_structs[len-1].pk_num  ){
+				for (std::vector<PkStruct>::iterator inter = vec_pk_hand_type_struct_[1].pk_structs.begin();inter!=vec_pk_hand_type_struct_[1].pk_structs.end();inter++){
+					vec_pk_hand_type_struct_[0].pk_structs.push_back(*inter);
+				}
+				vec_pk_hand_type_struct_[0].type = DOUBLE_SHUNZHI_PK;
+				vec_pk_hand_type_struct_.erase(vec_pk_hand_type_struct_.end());
+			}
+		}
+	}
+	 
+	//赋值
+	for (std::vector<PkHandleTypeStruct>::iterator inter=vec_pk_hand_type_struct_.begin();inter!=vec_pk_hand_type_struct_.end();inter++){
+		vec_pk_hand_type_struct.push_back(*inter);
+	}
+	
+	return vec_pks;
+}
+
+//提取对子
+std::vector<PkStruct> Rule::AiDouble(std::vector<PkStruct> &vec_pks){
+
+	for (std::vector<PkStruct>::iterator inter = vec_pks.begin();inter!=vec_pks.end();){
+
+		bool is_can_add = false;
+		if (inter+1 == vec_pks.end()){
+			break;
+		}
+
+		for (std::vector<PkStruct>::iterator inter2 = inter+1;inter2!=vec_pks.end();){
+			if (inter->pk_num == inter2->pk_num){
+				PkHandleTypeStruct type_struct;
+				type_struct.type = DOUBLE_PK;
+				type_struct.pk_structs.push_back(*inter);
+				type_struct.pk_structs.push_back(*inter2);
+				vec_pk_hand_type_struct.push_back(type_struct);
+				
+				inter2 = vec_pks.erase(inter2);
+				inter = vec_pks.erase(inter);
+				is_can_add = true;
+				break;
+			}else{
+				inter2++;
+			}
+		}
+
+		if (!is_can_add){
+			++inter;
+		}
+	}
+
+	return vec_pks;
+}
+
+//提取单牌
+void Rule::AiSingle(std::vector<PkStruct> &vec_pks){
+	for (std::vector<PkStruct>::iterator inter = vec_pks.begin();inter!=vec_pks.end();inter++){
+		PkHandleTypeStruct type_struct;
+		type_struct.type = SINGLE_PK;
+		type_struct.pk_structs.push_back(*inter);
+		vec_pk_hand_type_struct.push_back(type_struct);
 	}
 }

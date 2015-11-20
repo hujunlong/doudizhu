@@ -23,6 +23,10 @@ GameLayer::GameLayer():m_callTime(0),m_outPk(0){
 
 	srand ((unsigned)time(nullptr));
 	m_callTime = rand()%3;
+
+	for (int i=0;i<3;i++){
+		is_split[i] = false;
+	}
 }
 
 GameLayer::~GameLayer(){
@@ -171,8 +175,7 @@ void GameLayer::menuCallBackOneScore(CCObject* sender){
 	CCSize size = CCDirector::sharedDirector()->getVisibleSize();
 	ShowScore(CCPoint(size.width/2,m_player->getStartLocation().y+menu_score_top),score_one);
 	CCMenuItemFont* font = (CCMenuItemFont*) sender;
-	font->getParent()->setVisible(false);
-	 
+	font->getParent()->setVisible(false); 
 }
  
 
@@ -446,7 +449,7 @@ void GameLayer::update(float delta){
 	switch (m_state)
 	{
 	case 0:
-		sendPk();
+		sendPk();	
 		break;
 	case 1:
 		schedule(schedule_selector(GameLayer::Call),1);
@@ -527,6 +530,8 @@ void GameLayer::GiveDiZhuThreePk(){
 		break;
 	}
 	
+	rule.GiveDizhuPks(m_call.People);
+
 	//主玩家牌可点击
 	playerPkCanClick();
 	this->unschedule(schedule_selector(GameLayer::Call));
@@ -602,8 +607,16 @@ void GameLayer::OutPk(float delta){
 		m_handle_menu->setVisible(true);
 		break;
 	case 1:
+		if(!is_split[1]){
+			is_split[1] = true;
+			rule.AiSplitPks(1);
+		}
 		break;
 	case 2:
+		if(!is_split[2]){
+			is_split[2] = true;
+			rule.AiSplitPks(2);
+		}
 		break;
 	default:
 		break;
