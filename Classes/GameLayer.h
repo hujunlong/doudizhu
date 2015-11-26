@@ -6,10 +6,15 @@
 
 USING_NS_CC;
 
+struct Paixing:public CCObject
+{
+	CARD_TYPE type;
+	std::vector<Poker*> vec;
+};
+
 class GameLayer : public CCLayer
 {
 public:
-
 	GameLayer(void);
 	~GameLayer(void);
 	virtual bool init();
@@ -38,7 +43,11 @@ public:
 	void Call(float dt);//叫地主
 	void NpcCall(Player* npc,int index);//电脑叫牌
 	void GiveDiZhuThreePk();//给地主三张牌
+	void ClearOutPks();//清除所有出牌
+	void NpcOutPks(int type);//NPC出牌
+	void SplitPks(int type,Player* m_npc);//传入npc编号 1：npc1 2:npc2
 	void OutPk(float delta);
+	
 private: 
 	 CCArray* m_arrPokers;//所以的牌
 	 CC_SYNTHESIZE(CCArray*,m_arrayPlayerOut,ArrayPlayerOut);//玩家要出的牌
@@ -66,4 +75,7 @@ private:
 	 int m_sendPk_num;//发牌 发了多少张了
 	 
 	 bool is_split[3];//
+
+	 std::vector<Paixing> npc1_pk_type;
+	 std::vector<Paixing> npc2_pk_type;
 };

@@ -41,7 +41,8 @@ enum CARD_TYPE{
 	SINGLE_SHUNZHI_PK,		//单连
 	DOUBLE_SHUNZHI_PK,      //双连
 	THREE_SHUNZHI_PK,       //三连
-	PLANE_ADD_WINGS_PK,		//飞机带翅膀
+	PLANE_ADD_WINGS_SINGLE_PK,//飞机带翅膀
+	PLANE_ADD_WINGS_DOUBLE_PK,//飞机带翅膀
 	BOMB_TWO_PK,			//四个带2张单牌
 	BOMB_DOUBLE_TWO_PK,		//四个带2对
 	ERROR_PK				//错误的牌型

@@ -89,7 +89,7 @@ bool GameLayer::createPokers(){
 	{
 		pk = selectPoker(rule.pks[i].pk_type,rule.pks[i].pk_num);
 		pk->setPosition(ccp(size.width/2,size.height/2));
-		pk->showBack();
+		//pk->showBack();
 		this->addChild(pk);
 		this->m_arrPokers->addObject(pk);
 	}
@@ -131,11 +131,11 @@ bool GameLayer::initPlayer(){
 	m_playerOut->setHandleType(PLAYER_HAND_PK);
 
 	//NPC1 出牌位置
-	m_npcOneOut->setStartLocation(ccp(146,size.height/2+20));
+	m_npcOneOut->setStartLocation(ccp(354,size.height/2+20));
 	m_npcOneOut->setHandleType(COMPUTER_1_HANDLE_PK);
 
 	//NPC2 出牌位置
-	m_npcTwoOut->setStartLocation(ccp(654,size.height/2+20));
+	m_npcTwoOut->setStartLocation(ccp(146,size.height/2+20));
 	m_npcTwoOut->setHandleType(COMPUTER_2_HANDLE_PK);
 	return true;
 }
@@ -232,7 +232,7 @@ void GameLayer::menuCallDiZhu(CCObject* sender){
 }
 
 void GameLayer::menuNotHandle(CCObject* sender){
-	++m_outPk;
+	//++m_outPk;
 	while (m_arrayPlayerOut->count() > 0){
 		Poker* pk = (Poker*)m_arrayPlayerOut->objectAtIndex(0);
 		if (pk->getSelect())
@@ -273,7 +273,7 @@ void GameLayer::menuHandle(CCObject* sender){
 	if (IsOutPkFinish()){
 
 	}else{
-		++m_outPk;
+		//++m_outPk;
 	}
 	
 }
@@ -419,7 +419,7 @@ void GameLayer::sendPk(){
 
 	}else if (m_sendPk_num>50 && m_sendPk_num<54){
 		pk = (Poker*)m_arrPokers->objectAtIndex(m_sendPk_num);
-		pk->showBack();
+		//pk->showBack();
 		MovePk(m_Three,pk);
 		++m_sendPk_num;
 	}
@@ -605,20 +605,118 @@ void GameLayer::OutPk(float delta){
 	switch (m_outPk%3){
 	case 0:
 		m_handle_menu->setVisible(true);
+		++m_outPk;
 		break;
 	case 1:
 		if(!is_split[1]){
 			is_split[1] = true;
 			rule.AiSplitPks(1);
+			SplitPks(1,m_npcOne);
 		}
+		
+		ClearOutPks();
+		NpcOutPks(1);
+		++m_outPk;
 		break;
 	case 2:
 		if(!is_split[2]){
 			is_split[2] = true;
 			rule.AiSplitPks(2);
+			SplitPks(2,m_npcTwo);
 		}
+		ClearOutPks();
+		NpcOutPks(2);
+		++m_outPk;
 		break;
 	default:
 		break;
 	}
+}
+
+//清除所有出牌
+void GameLayer::ClearOutPks(){
+	CCObject *object;
+	CCARRAY_FOREACH(m_playerOut->getArrPK(),object){//玩家出牌
+		Poker *pk = (Poker*) object;
+		pk->setVisible(false);
+	}
+	m_playerOut->getArrPK()->removeAllObjects();
+
+	CCARRAY_FOREACH(m_npcOneOut->getArrPK(),object){//NPC1出牌
+		Poker *pk = (Poker*) object;
+		pk->setVisible(false);
+	}
+	m_npcOneOut->getArrPK()->removeAllObjects();
+
+	CCARRAY_FOREACH(m_npcTwoOut->getArrPK(),object){//NPC2出牌
+		Poker *pk = (Poker*) object;
+		pk->setVisible(false);
+	}
+	m_npcTwoOut->getArrPK()->removeAllObjects();
+
+	this->getChildByTag(NpcTwoNotPlay)->setVisible(false);
+	this->getChildByTag(NpcOneNotPlay)->setVisible(false);
+}
+
+void GameLayer::NpcOutPks(int type){
+	if (type == 1)
+	{
+		if (npc1_pk_type.size() <= 0 ){
+			return;
+		}
+
+		for (int i=0;i<npc1_pk_type[0].vec.size();i++)
+		{
+			m_npcOneOut->getArrPK()->addObject(npc1_pk_type[0].vec[i]);
+		}
+		npc1_pk_type.erase(npc1_pk_type.begin());
+		m_npcOneOut->updatePkPosion();
+		m_npcOne->updatePkPosion();
+	}
+	else{
+		if (npc2_pk_type.size() <= 0 ){
+			return;
+		}
+
+		for (int i=0;i<npc2_pk_type[0].vec.size();i++)
+		{
+			m_npcTwoOut->getArrPK()->addObject(npc2_pk_type[0].vec[i]);
+		}
+
+		npc2_pk_type.erase(npc2_pk_type.begin());
+		m_npcTwoOut->updatePkPosion();
+		//m_npcTwo->updatePkPosion();
+	}
+}
+
+void GameLayer::SplitPks(int type,Player* m_npc){
+
+	Paixing npc_pk_type_;
+	CCObject *object;
+	
+	CCLog("####################################");
+	CCARRAY_FOREACH(m_npc->getArrPK(),object){
+		Poker *pk = (Poker*) object;
+		CCLog("type = %i value=%i",pk->getPkType(),pk->getPkNum() );
+	}	
+	CCLog("####################################");
+
+	for (std::vector<PkHandleTypeStruct>::iterator iter= rule.vec_pk_hands.begin();iter != rule.vec_pk_hands.end();iter++){
+		npc_pk_type_.type = iter->type;
+
+		for (int i=0;i<iter->pk_structs.size();i++){
+			CCARRAY_FOREACH(m_npc->getArrPK(),object){
+				Poker *pk = (Poker*) object;
+				if (pk->getPkType() == iter->pk_structs[i].pk_type && pk->getPkNum() == iter->pk_structs[i].pk_num){
+					npc_pk_type_.vec.push_back(pk);
+				}
+			}	 
+		}
+
+		if (type == 1)
+			npc1_pk_type.push_back(npc_pk_type_);
+		else
+			npc2_pk_type.push_back(npc_pk_type_);
+	}
+
 }

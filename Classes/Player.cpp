@@ -54,7 +54,7 @@ void Player::updatePkPosion(){ //Íæ¼ÒÖÖÀà:0ÎªÍæ¼Ò£¬1ÎªµçÄÔ£¬2ÎªÏÔÊ¾µÄÈýÕÅÅÆ,3ÎªÍ
 		}
 
 		else if (m_HandleType == COMPUTER_ARRAY_PK){
-			pk->showBack();
+			//pk->showBack();
 			pk->setPosition(ccp(x,y-index*pkDistance));
 		}
 
