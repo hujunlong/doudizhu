@@ -6,11 +6,7 @@
 
 USING_NS_CC;
 
-struct Paixing:public CCObject
-{
-	CARD_TYPE type;
-	std::vector<Poker*> vec;
-};
+
 
 class GameLayer : public CCLayer
 {
@@ -44,10 +40,10 @@ public:
 	void NpcCall(Player* npc,int index);//电脑叫牌
 	void GiveDiZhuThreePk();//给地主三张牌
 	void ClearOutPks();//清除所有出牌
-	void NpcOutPks(int type);//NPC出牌
+	bool NpcOutPks(Player* m_npc,Player* m_npcOut);//NPC出牌
+	bool NpcFollowPks(Player* m_npc,Player* m_npcOut);//NPC跟牌
 	void SplitPks(int type,Player* m_npc);//传入npc编号 1：npc1 2:npc2
 	void OutPk(float delta);
-	
 private: 
 	 CCArray* m_arrPokers;//所以的牌
 	 CC_SYNTHESIZE(CCArray*,m_arrayPlayerOut,ArrayPlayerOut);//玩家要出的牌
@@ -64,7 +60,8 @@ private:
 	 StructCallPk m_call;//分数叫牌 (0 1 2:玩家 电脑1 电脑2)
 	 int m_callTime;//轮流叫地主
 	 int m_outPk;//该某人出牌
-	 CCArray* m_arrFollowPk;//要跟的牌
+
+	 PkHandType old_handle_pks;//上一把出牌
 	 Menu* m_menu;//叫地主菜单
 	 Menu* m_handle_menu;//出牌菜单
 	 Menu* m_success_menu;//成功菜单
@@ -73,9 +70,5 @@ private:
 	 CCLabelTTF* showScore;//显示叫牌分数
 	 int m_state;//状态 0 发牌 1选地主 2打牌
 	 int m_sendPk_num;//发牌 发了多少张了
-	 
-	 bool is_split[3];//
-
-	 std::vector<Paixing> npc1_pk_type;
-	 std::vector<Paixing> npc2_pk_type;
+	 bool is_split[3];
 };

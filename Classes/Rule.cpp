@@ -324,6 +324,9 @@ std::vector<PkStruct> Rule::AiThreePks(vector<PkHandleTypeStruct> vec_pk_handle_
 
 void Rule::AiSplitPks(int type){ //0 1 2 玩家 npc1 npc2 
 
+	vec_pk_hand_type_struct.clear();
+	vec_pk_hands.clear();
+
 	std::vector<PkStruct> my_pks;
 	switch (type)
 	{
@@ -754,19 +757,21 @@ void Rule::AiHandPksType(std::vector<PkHandleTypeStruct> vec_pk_hand_type_struct
 	}
 
 	//将剩余的牌添加到handle vector 中
-	for (int i=0;i<single_vec.size();i++)
-		vec_pk_hands.push_back(single_vec[i]);
-	for (int i=0;i<double_vec.size();i++)
-		vec_pk_hands.push_back(double_vec[i]);
+	int single_len = single_vec.size()-1;
+	int double_len = double_vec.size()-1;
+	for (int i=0;i<=single_len;i++)
+		vec_pk_hands.push_back(single_vec[single_len - i]);
+	for (int i=0;i<=double_len;i++)
+		vec_pk_hands.push_back(double_vec[double_len - i]);
+
+	reverse(vec_pk_hands.begin(),vec_pk_hands.end());
 
 	//将单王 跟 2添加进来
 	for (std::vector<PkHandleTypeStruct>::iterator inter = vec_pk_hand_type_struct.begin();inter!=vec_pk_hand_type_struct.end();inter++){
 		if (inter->pk_structs[0].pk_num >= Er)
 			vec_pk_hands.push_back(*inter);
 	}
-	//reverse(vec_pk_hands.begin(),vec_pk_hands.end());
 }
-
 
 
 //飞机
