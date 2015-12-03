@@ -195,14 +195,6 @@ void Rule::AiSplitPks(std::vector<PkStruct> my_pks){ //0 1 2 玩家 npc1 npc2
 	//排序
 	sort(my_pks.begin(),my_pks.end(),Rule::SelectShort);
 
-// 	CCLog("/////////////////////////////////");
-// 	for (vector<PkStruct>::iterator iter=my_pks.begin();iter!=my_pks.end();iter++) 
-// 	{
-// 		CCLog("type = %i value=%i",iter->pk_type,iter->pk_num);
-// 
-// 	}
-// 	CCLog("/////////////////////////////////");
-
 	vector<PkHandleTypeStruct> vec_pk_handle_struct_;
 	//提取双王
 	if (my_pks[0].pk_type == Joker && my_pks[1].pk_type == Joker){	
@@ -280,7 +272,7 @@ void Rule::AiSplitPks(std::vector<PkStruct> my_pks){ //0 1 2 玩家 npc1 npc2
 
 	//出牌
 	AiHandPksType(vec_pk_hand_type_struct);
-	int a = 12;
+
 }
 
 //提取三张一样的牌
@@ -508,41 +500,52 @@ void Rule::GetOneAiLianDui(){
 	for (std::vector<PkHandleTypeStruct>::iterator iter = vec_pk_hand_type_struct.begin();iter != vec_pk_hand_type_struct.end();iter++){
 		if (iter->type == DOUBLE_PK){
 
-			pk_num_old = iter->pk_structs[0].pk_num;
-			buff.pk_structs.push_back(iter->pk_structs[0]);
-			buff.pk_structs.push_back(iter->pk_structs[1]);
+			if (iter->pk_structs[0].pk_num >= Er)
+				continue;
 
-			if (count == 0){
-				count+=1;
+			if (count == 0)
+			{
+				pk_num_old = iter->pk_structs[0].pk_num;
+				buff.pk_structs.push_back(iter->pk_structs[0]);
+				buff.pk_structs.push_back(iter->pk_structs[1]);
+				count = 1;
 			}else{
 				if (pk_num_old - 1 == iter->pk_structs[0].pk_num){
 					count+=1;
-				}
-				else{
-					if (count >= 3)//已经拥有连队了
-					{
-						vec_pk_hand_type_struct.push_back(buff);
-						buff.pk_structs.clear();
-						break;
-					}
-
-					count == 1;
-					buff.pk_structs.clear();
+					pk_num_old = iter->pk_structs[0].pk_num;
 					buff.pk_structs.push_back(iter->pk_structs[0]);
 					buff.pk_structs.push_back(iter->pk_structs[1]);
+				}else{
+					if (count >= 3)
+					{
+						count = 0;
+						vec_pk_hand_type_struct.push_back(buff);
+						break;
+					}else{
+						count = 1;
+						pk_num_old = iter->pk_structs[0].pk_num;
+						buff.pk_structs.clear();
+						buff.pk_structs.push_back(iter->pk_structs[0]);
+						buff.pk_structs.push_back(iter->pk_structs[1]);
+					}
 				}
 			}
 		}
 	}
 
-	if (count >= 3)//已经拥有连队了
+	//一直连到最后
+	if (count >= 3)
 	{
 		vec_pk_hand_type_struct.push_back(buff);
-		buff.pk_structs.clear();
+	}
+
+	if (buff.pk_structs.size() < 6)
+	{
+		return;
 	}
 
 	//删除提取后的连队
-	for (std::vector<PkStruct>::iterator iter = buff.pk_structs.begin();iter != buff.pk_structs.end();iter+2){
+	for (std::vector<PkStruct>::iterator iter = buff.pk_structs.begin();iter != buff.pk_structs.end();iter++){
 		for (std::vector<PkHandleTypeStruct>::iterator iter2 = vec_pk_hand_type_struct.begin();iter2 != vec_pk_hand_type_struct.end();){
 			if (iter2->type == DOUBLE_PK){
 				if (iter2->pk_structs[0].pk_num == iter->pk_num){
@@ -550,11 +553,12 @@ void Rule::GetOneAiLianDui(){
 				}else{
 					iter2++;
 				}
+			}else{
+				iter2++;
 			}
 		}
 	}
- 
-	
+
 }
 
 //提取对子
@@ -610,92 +614,7 @@ void Rule::AiHandPksType(std::vector<PkHandleTypeStruct> vec_pk_hand_type_struct
 	std::vector<PkHandleTypeStruct> double_vec;
 	std::vector<PkHandleTypeStruct> three_shunzhi_vec; 
 
-	CCLog("======================================================");
-	for (std::vector<PkHandleTypeStruct>::iterator inter = vec_pk_hand_type_struct.begin();inter!=vec_pk_hand_type_struct.end();inter++){
-		for (int i=0;i<inter->pk_structs.size();i++)
-		{
-			CCLog("type = %i value=%i",inter->pk_structs[i].pk_type,inter->pk_structs[i].pk_num);
-		}
-	}
-	CCLog("======================================================");
-	/*
-	vec_pk_hand_type_struct.clear();
-	PkHandleTypeStruct my_struct;
-	PkStruct pk_struct;
-	my_struct.type = PLANE_PK;
 
-	pk_struct.pk_type = 4;
-	pk_struct.pk_num = 14;
-	my_struct.pk_structs.push_back(pk_struct);
-
-	pk_struct.pk_type = 4;
-	pk_struct.pk_num = 13;
-	my_struct.pk_structs.push_back(pk_struct);
-	vec_pk_hand_type_struct.push_back(my_struct);
-	my_struct.pk_structs.clear();
-
-	my_struct.type = THREE_SHUNZHI_PK;
-	pk_struct.pk_type = 2;
-	pk_struct.pk_num = 10;
-	my_struct.pk_structs.push_back(pk_struct);
-	pk_struct.pk_type = 0;
-	pk_struct.pk_num = 10;
-	my_struct.pk_structs.push_back(pk_struct);
-	pk_struct.pk_type = 3;
-	pk_struct.pk_num = 10;
-	my_struct.pk_structs.push_back(pk_struct);
-
-	pk_struct.pk_type = 2;
-	pk_struct.pk_num = 11;
-	my_struct.pk_structs.push_back(pk_struct);
-	pk_struct.pk_type = 0;
-	pk_struct.pk_num = 11;
-	my_struct.pk_structs.push_back(pk_struct);
-	pk_struct.pk_type = 3;
-	pk_struct.pk_num = 11;
-	my_struct.pk_structs.push_back(pk_struct);
-
-	vec_pk_hand_type_struct.push_back(my_struct);
-	my_struct.pk_structs.clear();
-
-	my_struct.type = DOUBLE_PK;
-	pk_struct.pk_type = 0;
-	pk_struct.pk_num = 0;
-	my_struct.pk_structs.push_back(pk_struct);
-	pk_struct.pk_type = 2;
-	pk_struct.pk_num = 0;
-	my_struct.pk_structs.push_back(pk_struct);
-	vec_pk_hand_type_struct.push_back(my_struct);
-	my_struct.pk_structs.clear();
-
-	my_struct.type = SINGLE_PK;
-	pk_struct.pk_type = 0;
-	pk_struct.pk_num = 12;
-	my_struct.pk_structs.push_back(pk_struct);
-	vec_pk_hand_type_struct.push_back(my_struct);
-	my_struct.pk_structs.clear();
-
-	my_struct.type = SINGLE_PK;
-	pk_struct.pk_type = 3;
-	pk_struct.pk_num = 10;
-	my_struct.pk_structs.push_back(pk_struct);
-	vec_pk_hand_type_struct.push_back(my_struct);
-	my_struct.pk_structs.clear();
-
-	my_struct.type = SINGLE_PK;
-	pk_struct.pk_type = 3;
-	pk_struct.pk_num = 8;
-	my_struct.pk_structs.push_back(pk_struct);
-	vec_pk_hand_type_struct.push_back(my_struct);
-	my_struct.pk_structs.clear();
-
-	my_struct.type = SINGLE_PK;
-	pk_struct.pk_type = 2;
-	pk_struct.pk_num = 7;
-	my_struct.pk_structs.push_back(pk_struct);
-	vec_pk_hand_type_struct.push_back(my_struct);
-	my_struct.pk_structs.clear();
-	*/
 	reverse(vec_pk_hand_type_struct.begin(),vec_pk_hand_type_struct.end());
 	
 	for (std::vector<PkHandleTypeStruct>::iterator inter = vec_pk_hand_type_struct.begin();inter!=vec_pk_hand_type_struct.end();){
@@ -1069,7 +988,7 @@ bool Rule::IsThreeShunZhi(vector<PkStruct> vec_pks){
 
 //飞机带翅膀 单
 bool Rule::IsPlaneAddSingleWings(vector<PkStruct> vec_pks){
-	if (vec_pks.size() < 10)
+	if (vec_pks.size() < 6)
 		return false;
 
 	int single_num =0;
@@ -1095,7 +1014,7 @@ bool Rule::IsPlaneAddSingleWings(vector<PkStruct> vec_pks){
 
 //飞机带翅膀 双
 bool Rule::IsPlaneAddDoubleWings(vector<PkStruct> vec_pks){
-	if (vec_pks.size() < 10)
+	if (vec_pks.size() < 8)
 		return false;
 
 	int double_num =0;
@@ -1104,7 +1023,7 @@ bool Rule::IsPlaneAddDoubleWings(vector<PkStruct> vec_pks){
 	AiSplitPks(vec_pks);
 
 	for (std::vector<PkHandleTypeStruct>::iterator inter = vec_pk_hand_type_struct.begin();inter!=vec_pk_hand_type_struct.end();inter++){
-		if (inter->type == THREE_SHUNZHI_PK){
+		if (inter->type == BOMB_PK){
 			plane_num  = inter->pk_structs.size()/3;
 			is_plane = true;
 		}

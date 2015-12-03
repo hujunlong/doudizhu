@@ -89,7 +89,7 @@ bool GameLayer::createPokers(){
 	{
 		pk = selectPoker(rule.pks[i].pk_type,rule.pks[i].pk_num);
 		pk->setPosition(ccp(size.width/2,size.height/2));
-		//pk->showBack();
+		pk->showBack();
 		this->addChild(pk);
 		this->m_arrPokers->addObject(pk);
 	}
@@ -302,12 +302,14 @@ void GameLayer::menuHandle(CCObject* sender){
 	}
 
 	m_player->updatePkPosion();
-	++m_outPk;
 	m_arrayPlayerOut->removeAllObjects();
 	m_handle_menu->setVisible(false);
 
-	if (GameOver())
-		m_state = 4;
+	if (GameOver()){
+		m_state = 3;
+	}else{
+		++m_outPk;
+	}
 }
 
 bool GameLayer::IsOutPkFinish(){
@@ -364,6 +366,8 @@ void GameLayer::reStart(){
 	m_npcTwoOut->m_vec_types.clear();
 	m_npcTwoOut->getArrPK()->removeAllObjects();
 
+	old_handle_pks.vec_poker.clear();
+
 	m_call.People = 0;
 	m_call.CallScore = 0;
 
@@ -386,7 +390,8 @@ void GameLayer::reStart(){
 	rule.pks_three.clear();
 	rule.vec_pk_hand_type_struct.clear();
 	rule.vec_pk_hands.clear();
-
+	
+	this->removeAllChildren();
 	do 
 	{
 		CC_BREAK_IF(!initBackGround());
@@ -394,8 +399,9 @@ void GameLayer::reStart(){
 		CC_BREAK_IF(!initPlayer());
 		CC_BREAK_IF(!initButton());
 	} while (0);
-
+	/*
 	scheduleUpdate();
+	*/
 }
 
 void GameLayer::menuSuccess(CCObject* sender){
@@ -541,7 +547,7 @@ void GameLayer::sendPk(){
 
 	}else if (m_sendPk_num>50 && m_sendPk_num<54){
 		pk = (Poker*)m_arrPokers->objectAtIndex(m_sendPk_num);
-		//pk->showBack();
+		pk->showBack();
 		MovePk(m_Three,pk);
 		++m_sendPk_num;
 	}
@@ -578,8 +584,11 @@ void GameLayer::update(float delta){
 		break;
 	case 2:
 		scheduleOnce(schedule_selector(GameLayer::OutPk),1);
+		break;
 	case 3:
-
+		ClearOutPks();
+		m_state+=1;
+		break;
 	default:
 		break;
 	}
@@ -726,10 +735,11 @@ void GameLayer::Call(float dt){
 void GameLayer::OutPk(float delta){
 	switch (m_outPk%3){
 	case 0:
-		if (!is_split[0])
+		if ((!is_split[0]) && (m_player->getIsDiZhu()) )
 		{
-			is_split[0] = true;
 			m_player->setIsOutPk(true);
+			is_split[0] = true;
+			
 		}
 		ClearOutPks();
 		m_handle_menu->setVisible(true);
@@ -752,9 +762,13 @@ void GameLayer::OutPk(float delta){
 		}else{
 			this->getChildByTag(NpcOneNotPlay)->setVisible(true);
 		}
-		if (GameOver())
-			m_state = 4;
-		++m_outPk;
+
+		if (GameOver()){
+			m_state = 3;
+		}else{
+			++m_outPk;
+		}
+		
 		break;
 	case 2:
 		if(!is_split[2]){
@@ -766,7 +780,7 @@ void GameLayer::OutPk(float delta){
 				m_npcTwo->setIsOutPk(true);
 
 		}
-		ClearOutPks();
+		ClearOutPks(true);
 		if ( NpcFollowPks(m_npcTwo,m_npcTwoOut) ){
 			m_npcOne->setIsOutPk(false);
 			m_npcTwo->setIsOutPk(true);
@@ -774,9 +788,12 @@ void GameLayer::OutPk(float delta){
 		}else{
 			this->getChildByTag(NpcTwoNotPlay)->setVisible(true);
 		}
-		if (GameOver())
-			m_state = 4;
-		++m_outPk;
+		if (GameOver()){
+			m_state = 3;
+		}else{
+			++m_outPk;
+		}
+		
 		break;
 	default:
 		break;
@@ -790,7 +807,7 @@ bool GameLayer::GameOver(){
 		return true;
 	}
 
-	if (m_npcOne->getArrPK()->count() == 0){//npc1赢牌
+	if (m_npcOne->getArrPK()->count()  == 0){//npc1赢牌
 		if (m_npcOne->getIsDiZhu())
 		{
 			m_lost_menu->setVisible(true);
@@ -817,6 +834,8 @@ bool GameLayer::GameOver(){
 			if (!m_player->getIsDiZhu()){//我不是地主
 				m_success_menu->setVisible(true);
 				return true;
+			}else{
+				m_lost_menu->setVisible(true);
 			}
 		}
 	}
@@ -826,7 +845,7 @@ bool GameLayer::GameOver(){
 }
 
 //清除所有出牌
-void GameLayer::ClearOutPks(){
+void GameLayer::ClearOutPks(bool is_player_pre){
 	CCObject *object;
 
 	//清除所有选中的pk
@@ -842,12 +861,13 @@ void GameLayer::ClearOutPks(){
 	}
 	m_npcOneOut->getArrPK()->removeAllObjects();
 
-	CCARRAY_FOREACH(m_npcTwoOut->getArrPK(),object){//NPC2出牌
-		Poker *pk = (Poker*) object;
-		pk->setVisible(false);
+	if (is_player_pre){
+		CCARRAY_FOREACH(m_npcTwoOut->getArrPK(),object){//NPC2出牌
+			Poker *pk = (Poker*) object;
+			pk->setVisible(false);
+		}
+		m_npcTwoOut->getArrPK()->removeAllObjects();
 	}
-	m_npcTwoOut->getArrPK()->removeAllObjects();
-
 	this->getChildByTag(NpcTwoNotPlay)->setVisible(false);
 	this->getChildByTag(NpcOneNotPlay)->setVisible(false);
 
@@ -873,11 +893,19 @@ void GameLayer::SplitPks(int type,Player* m_npc){
 			m_npcOne->m_vec_types.push_back(npc_pk_type_);
 		else
 			m_npcTwo->m_vec_types.push_back(npc_pk_type_);
+
+		for (int i=0;i<iter->pk_structs.size();i++)
+		{
+			CCLog("type = %i value = %i",iter->type,iter->pk_structs[i].pk_num);
+		}
 	}
+
 }
 
 
 bool GameLayer::NpcOutPks(Player* m_npc,Player* m_npcOut){
+	m_npcOut->getArrPK()->removeAllObjects();
+
 	if (m_npc->m_vec_types.size() <= 0 ){
 		return false;
 	}
@@ -903,6 +931,7 @@ bool GameLayer::NpcOutPks(Player* m_npc,Player* m_npcOut){
 bool GameLayer::NpcFollowPks(Player* m_npc,Player* m_npcOut){
 	if (m_npc->m_vec_types.size() <= 0 ){
 		GameOver();
+		m_state = 3;
 		return false;
 	}
 

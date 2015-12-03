@@ -40,7 +40,7 @@ public:
 	void Call(float dt);//叫地主
 	void NpcCall(Player* npc,int index);//电脑叫牌
 	void GiveDiZhuThreePk();//给地主三张牌
-	void ClearOutPks();//清除所有出牌
+	void ClearOutPks(bool is_player_pre =false);//清除所有出牌
 	bool NpcOutPks(Player* m_npc,Player* m_npcOut);//NPC出牌
 	bool NpcFollowPks(Player* m_npc,Player* m_npcOut);//NPC跟牌
 	void SplitPks(int type,Player* m_npc);//传入npc编号 1：npc1 2:npc2
