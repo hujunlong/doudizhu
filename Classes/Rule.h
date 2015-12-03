@@ -27,7 +27,9 @@ public:
 	int Call(int index);//传入npc是第几个
 	void AiSplitPks(int type);//分析牌型
 	void AiSplitPks(vector<PkStruct> vec_pks);//分析牌型
+	int PlayerRule(vector<PkStruct> my_vec_pks,PkHandleTypeStruct pk_handle_type_struct);//检查是否合符规则
 	//判断是否合符规则
+	bool IsFindPk(PkStruct pk,std::vector<PkHandleTypeStruct> pk_handle);//查找是否有该pk
 	bool IsPlane(vector<PkStruct> vec_pks);//是否为飞机
 	bool IsBomb(vector<PkStruct> vec_pks);//是否为炸弹出牌规则
 	bool IsThreeAddNoPk(vector<PkStruct> vec_pks);//是否为三不带
@@ -48,6 +50,8 @@ private:
 
 	std::vector<PkStruct> AiThreePks(vector<PkHandleTypeStruct> vec_pk_handle_struct_,std::vector<PkStruct> &vec_pks);//提取三顺
 	std::vector<PkStruct> AiSingleShunzhi(std::vector<PkStruct> &vec_pks);//提取顺子
+	void AiLianDui();//提取连队
+	void GetOneAiLianDui();//获取其中的一个连对
 	std::vector<PkStruct> AiDouble(std::vector<PkStruct> &vec_pks);//提取对子
 	void AiSingle(std::vector<PkStruct> &vec_pks);//单牌获取
 	void AiHandPksType(std::vector<PkHandleTypeStruct> vec_pk_hand_type_struct);//出手牌型

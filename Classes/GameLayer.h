@@ -29,6 +29,7 @@ public:
 	void menuNotHandle(CCObject* sender);//不出
 	void menuHandle(CCObject* sender);//出牌
 	void menuSuccess(CCObject* sender);//胜利
+	void menuLost(CCObject* sender);//失败
 	void reStart();//重新开始
 	bool IsOutPkFinish();//是否出完牌
 	void sendPk();//发牌
@@ -43,10 +44,12 @@ public:
 	bool NpcOutPks(Player* m_npc,Player* m_npcOut);//NPC出牌
 	bool NpcFollowPks(Player* m_npc,Player* m_npcOut);//NPC跟牌
 	void SplitPks(int type,Player* m_npc);//传入npc编号 1：npc1 2:npc2
+	bool GameOver();//结果检查
 	void OutPk(float delta);
+
 private: 
 	 CCArray* m_arrPokers;//所以的牌
-	 CC_SYNTHESIZE(CCArray*,m_arrayPlayerOut,ArrayPlayerOut);//玩家要出的牌
+	 CC_SYNTHESIZE(CCArray*,m_arrayPlayerOut,ArrayPlayerOut);//玩家选中的牌
 	 CC_SYNTHESIZE(Player*,m_playerOut,PlayerOut);//玩家出的牌
 	 CC_SYNTHESIZE(Player*,m_player,Player);//玩家
 

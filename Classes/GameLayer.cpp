@@ -232,6 +232,10 @@ void GameLayer::menuCallDiZhu(CCObject* sender){
 }
 
 void GameLayer::menuNotHandle(CCObject* sender){
+	if (m_player->getIsOutPk())
+	{
+		return;//自己上轮是赢家
+	}
 	while (m_arrayPlayerOut->count() > 0){
 		Poker* pk = (Poker*)m_arrayPlayerOut->objectAtIndex(0);
 		if (pk->getSelect())
@@ -245,14 +249,51 @@ void GameLayer::menuNotHandle(CCObject* sender){
 
 void GameLayer::menuHandle(CCObject* sender){
 	CCObject *object;
+	vector<PkStruct> my_vec_pks;
+	PkHandleTypeStruct pk_handle_type_struct;
+
+	//检查出牌合法性 
+	CCARRAY_FOREACH(m_arrayPlayerOut,object){
+		Poker* pk = (Poker*)object;
+		PkStruct pk_struct;
+		pk_struct.pk_type = pk->getPkType();
+		pk_struct.pk_num = pk->getPkNum();
+		my_vec_pks.push_back(pk_struct);
+	}
+
+	//上一把出牌
+	if (!m_player->getIsOutPk())
+	{
+		for (int i=0;i<old_handle_pks.vec_poker.size();i++){
+			PkStruct pk_struct;
+			pk_struct.pk_num = old_handle_pks.vec_poker[i]->getPkNum();
+			pk_struct.pk_type = old_handle_pks.vec_poker[i]->getPkType();
+
+			pk_handle_type_struct.type = old_handle_pks.type;
+			pk_handle_type_struct.pk_structs.push_back(pk_struct);
+		}
+	}
+
+	
+	//检查合法性
+	int result = rule.PlayerRule(my_vec_pks,pk_handle_type_struct);
+	if (result == ERROR_PK)
+		return;
+
+
+	m_npcOne->setIsOutPk(false);
+	m_npcTwo->setIsOutPk(false);
+	m_player->setIsOutPk(true);
+	 old_handle_pks.vec_poker.clear();
+	 old_handle_pks.type = (CARD_TYPE)result;
+	 CCARRAY_FOREACH(m_arrayPlayerOut,object){
+		 Poker* pk = (Poker*)object;
+		 old_handle_pks.vec_poker.push_back(pk);
+	 }
 
 	m_playerOut->getArrPK()->removeAllObjects();
 	m_playerOut->getArrPK()->addObjectsFromArray(m_arrayPlayerOut);
 	
-// 	m_arrFollowPk->removeAllObjects();
-// 	m_arrFollowPk->addObjectsFromArray(m_arrayPlayerOut);
-// 	m_arrayPlayerOut->removeAllObjects();
-
 	m_playerOut->updatePkPosion();
 	CCARRAY_FOREACH(m_playerOut->getArrPK(),object){
 		Poker* pk = (Poker*)object;
@@ -262,6 +303,11 @@ void GameLayer::menuHandle(CCObject* sender){
 
 	m_player->updatePkPosion();
 	++m_outPk;
+	m_arrayPlayerOut->removeAllObjects();
+	m_handle_menu->setVisible(false);
+
+	if (GameOver())
+		m_state = 4;
 }
 
 bool GameLayer::IsOutPkFinish(){
@@ -270,10 +316,96 @@ bool GameLayer::IsOutPkFinish(){
 
 void GameLayer::reStart(){
 
+	this->getChildByTag(NpcOneNotPlay)->setVisible(false);
+
+	this->getChildByTag(NpcTwoNotPlay)->setVisible(false);
+
+	m_arrPokers->removeAllObjects();
+	//player click
+	m_arrayPlayerOut->removeAllObjects();
+
+	//player pk
+	m_player->m_vec_types.clear();
+	m_player->setIsDiZhu(false);
+	m_player->setCall(false);
+	m_player->setCallScore(0);
+	m_player->getArrPK()->removeAllObjects();
+	m_player->setIsOutPk(false);
+ 
+	//npc one
+	m_npcOne->m_vec_types.clear();
+	m_npcOne->setIsDiZhu(false);
+	m_npcOne->setCall(false);
+	m_npcOne->setCallScore(0);
+	m_npcOne->getArrPK()->removeAllObjects();
+	m_npcOne->setIsOutPk(false);
+
+	//npc one
+	m_npcTwo->m_vec_types.clear();
+	m_npcTwo->setIsDiZhu(false);
+	m_npcTwo->setCall(false);
+	m_npcTwo->setCallScore(0);
+	m_npcTwo->getArrPK()->removeAllObjects();
+	m_npcTwo->setIsOutPk(false);
+
+	//m_three
+	m_Three->m_vec_types.clear();
+	m_Three->getArrPK()->removeAllObjects();
+
+	//player handle
+	m_playerOut->m_vec_types.clear();
+	m_playerOut->getArrPK()->removeAllObjects();
+
+	//npc handle 1
+	m_npcOneOut->m_vec_types.clear();
+	m_npcOneOut->getArrPK()->removeAllObjects();
+
+	//npc handle 2
+	m_npcTwoOut->m_vec_types.clear();
+	m_npcTwoOut->getArrPK()->removeAllObjects();
+
+	m_call.People = 0;
+	m_call.CallScore = 0;
+
+	m_state = 0;
+	m_sendPk_num = 0;
+
+	m_callTime = rand()%3;
+
+	for (int i=0;i<3;i++){
+		is_split[i] = false;
+	}
+
+	m_lableDiZhu->setVisible(false);
+	
+
+	rule.pks.clear();
+	rule.pks_player.clear();
+	rule.pks_npc1.clear();
+	rule.pks_npc2.clear();
+	rule.pks_three.clear();
+	rule.vec_pk_hand_type_struct.clear();
+	rule.vec_pk_hands.clear();
+
+	do 
+	{
+		CC_BREAK_IF(!initBackGround());
+		CC_BREAK_IF(!createPokers());
+		CC_BREAK_IF(!initPlayer());
+		CC_BREAK_IF(!initButton());
+	} while (0);
+
+	scheduleUpdate();
 }
+
 void GameLayer::menuSuccess(CCObject* sender){
 	reStart();
 }
+
+void GameLayer::menuLost(CCObject* sender){
+	reStart();
+}
+
 
 bool GameLayer::initButton(){
 	Size size = Director::sharedDirector()->getVisibleSize();
@@ -365,13 +497,13 @@ bool GameLayer::initButton(){
 	//npctwo标签
 	tip = ((String *)strings->objectForKey("buchu"))->getCString();
 	CCLabelTTF* npcTwoNoHandle = CCLabelTTF::create(tip,"Helvetica-BoldOblique",20);
-	npcTwoNoHandle->setPosition(m_npcTwoOut->getStartLocation());
+	npcTwoNoHandle->setPosition(ccp(m_npcTwoOut->getStartLocation().x+30,m_npcTwoOut->getStartLocation().y));
 	this->addChild(npcTwoNoHandle,1,NpcTwoNotPlay);
 	npcTwoNoHandle->setVisible(false);
 
 	//npcone标签
 	CCLabelTTF* npcOneNoHandle = CCLabelTTF::create(tip,"Helvetica-BoldOblique",20);
-	npcOneNoHandle->setPosition(m_npcOneOut->getStartLocation());
+	npcOneNoHandle->setPosition( ccp(m_npcOneOut->getStartLocation().x - 30,m_npcOneOut->getStartLocation().y));
 	this->addChild(npcOneNoHandle,1,NpcOneNotPlay);
 	npcOneNoHandle->setVisible(false);
 
@@ -547,13 +679,13 @@ void GameLayer::Call(float dt){
 		case 0:
 			m_menu->setVisible(true);
 
-			if (m_call.CallScore < 1){
+			if (m_call.CallScore  == 0){
 				CCMenuItemFont* itemFont = (CCMenuItemFont*)m_menu->getChildByTag(score_one);
 				itemFont->setEnabled(true);
 				return;
 			}
 
-			if (m_call.CallScore > 1 && m_call.CallScore <= 2){
+			if (m_call.CallScore == 1){
 				CCMenuItemFont* itemFont = (CCMenuItemFont*)m_menu->getChildByTag(score_two);
 				itemFont->setEnabled(true);
 				CCMenuItemFont* buff_itemFont = (CCMenuItemFont*)m_menu->getChildByTag(score_one);
@@ -561,7 +693,7 @@ void GameLayer::Call(float dt){
 				return;
 			} 
 
-			if (m_call.CallScore >= 2 && m_call.CallScore < 3){
+			if (m_call.CallScore == 2){
 				CCMenuItemFont* itemFont = (CCMenuItemFont*)m_menu->getChildByTag(score_three);
 				itemFont->setEnabled(true);
 
@@ -594,8 +726,13 @@ void GameLayer::Call(float dt){
 void GameLayer::OutPk(float delta){
 	switch (m_outPk%3){
 	case 0:
+		if (!is_split[0])
+		{
+			is_split[0] = true;
+			m_player->setIsOutPk(true);
+		}
+		ClearOutPks();
 		m_handle_menu->setVisible(true);
-		//ClearOutPks();
 		break;
 	case 1:
 		if(!is_split[1]){
@@ -608,9 +745,15 @@ void GameLayer::OutPk(float delta){
 		
 		}
 		ClearOutPks();
-		if ( NpcFollowPks(m_npcOne,m_npcOneOut) )
+		if ( NpcFollowPks(m_npcOne,m_npcOneOut) ){
+			m_npcOne->setIsOutPk(true);
 			m_npcTwo->setIsOutPk(false);
-
+			m_player->setIsOutPk(false);
+		}else{
+			this->getChildByTag(NpcOneNotPlay)->setVisible(true);
+		}
+		if (GameOver())
+			m_state = 4;
 		++m_outPk;
 		break;
 	case 2:
@@ -624,19 +767,69 @@ void GameLayer::OutPk(float delta){
 
 		}
 		ClearOutPks();
-		if ( NpcFollowPks(m_npcTwo,m_npcTwoOut) )
+		if ( NpcFollowPks(m_npcTwo,m_npcTwoOut) ){
 			m_npcOne->setIsOutPk(false);
-
+			m_npcTwo->setIsOutPk(true);
+			m_player->setIsOutPk(false);
+		}else{
+			this->getChildByTag(NpcTwoNotPlay)->setVisible(true);
+		}
+		if (GameOver())
+			m_state = 4;
 		++m_outPk;
 		break;
 	default:
 		break;
 	}
+
+}
+
+bool GameLayer::GameOver(){
+	if (m_player->getArrPK()->count() == 0){//玩家赢牌
+		m_success_menu->setVisible(true);
+		return true;
+	}
+
+	if (m_npcOne->getArrPK()->count() == 0){//npc1赢牌
+		if (m_npcOne->getIsDiZhu())
+		{
+			m_lost_menu->setVisible(true);
+			return true;
+
+		}else{
+			if (!m_player->getIsDiZhu()){//我不是地主
+				m_success_menu->setVisible(true);
+				return true;
+			}else{
+				m_lost_menu->setVisible(true);
+				return true;
+			}
+		}
+	}
+
+	if (m_npcTwo->getArrPK()->count() == 0){//npc2赢牌
+		if (m_npcTwo->getIsDiZhu())
+		{
+			m_lost_menu->setVisible(true);
+			return true;
+
+		}else{
+			if (!m_player->getIsDiZhu()){//我不是地主
+				m_success_menu->setVisible(true);
+				return true;
+			}
+		}
+	}
+
+	return false;
+
 }
 
 //清除所有出牌
 void GameLayer::ClearOutPks(){
 	CCObject *object;
+
+	//清除所有选中的pk
 	CCARRAY_FOREACH(m_playerOut->getArrPK(),object){//玩家出牌
 		Poker *pk = (Poker*) object;
 		pk->setVisible(false);
@@ -657,21 +850,14 @@ void GameLayer::ClearOutPks(){
 
 	this->getChildByTag(NpcTwoNotPlay)->setVisible(false);
 	this->getChildByTag(NpcOneNotPlay)->setVisible(false);
+
+	m_handle_menu->setVisible(false);
 }
 
 void GameLayer::SplitPks(int type,Player* m_npc){
-
-	PkHandType npc_pk_type_;
 	CCObject *object;
-	
-	CCLog("####################################");
-	CCARRAY_FOREACH(m_npc->getArrPK(),object){
-		Poker *pk = (Poker*) object;
-		CCLog("type = %i value=%i",pk->getPkType(),pk->getPkNum() );
-	}	
-	CCLog("####################################");
-
 	for (std::vector<PkHandleTypeStruct>::iterator iter= rule.vec_pk_hands.begin();iter != rule.vec_pk_hands.end();iter++){
+		PkHandType npc_pk_type_;
 		npc_pk_type_.type = iter->type;
 
 		for (int i=0;i<iter->pk_structs.size();i++){
@@ -697,6 +883,7 @@ bool GameLayer::NpcOutPks(Player* m_npc,Player* m_npcOut){
 	}
 
 	//出最小牌
+	old_handle_pks.vec_poker.clear();
 	old_handle_pks = m_npc->m_vec_types[0];
 
 	for (int i=0;i< m_npc->m_vec_types[0].vec_poker.size();i++)
@@ -715,6 +902,7 @@ bool GameLayer::NpcOutPks(Player* m_npc,Player* m_npcOut){
 
 bool GameLayer::NpcFollowPks(Player* m_npc,Player* m_npcOut){
 	if (m_npc->m_vec_types.size() <= 0 ){
+		GameOver();
 		return false;
 	}
 
@@ -727,14 +915,14 @@ bool GameLayer::NpcFollowPks(Player* m_npc,Player* m_npcOut){
 	for (std::vector<PkHandType>::iterator iter = m_npc->m_vec_types.begin();iter != m_npc->m_vec_types.end();iter++)
 	{
 		if ( (iter->type == old_handle_pks.type) && (iter->vec_poker.size() == old_handle_pks.vec_poker.size())  && (iter->vec_poker[0]->getPkNum() > old_handle_pks.vec_poker[0]->getPkNum()) ){
+			old_handle_pks.vec_poker.clear();
 			old_handle_pks = *iter;
 			for (int i=0;i<iter->vec_poker.size();i++)
 			{
 				m_npcOut->getArrPK()->addObject( iter->vec_poker[i]);
 				m_npc->getArrPK()->removeObject(iter->vec_poker[i]);
 			}
-			m_npc->setIsOutPk(true);
-
+	
 			m_npc->m_vec_types.erase(iter);
 			m_npc->updatePkPosion();
 			m_npcOut->updatePkPosion();
@@ -753,13 +941,14 @@ bool GameLayer::NpcFollowPks(Player* m_npc,Player* m_npcOut){
 	{
 
 		if ( (iter->type == PLANE_PK ) ){
+			old_handle_pks.vec_poker.clear();
 			old_handle_pks = *iter;
 			for (int i=0;i<iter->vec_poker.size();i++)
 			{
 				m_npcOut->getArrPK()->addObject( iter->vec_poker[i]);
 				m_npc->getArrPK()->removeObject(iter->vec_poker[i]);
 			}
-			m_npc->setIsOutPk(true);
+	
 			m_npc->m_vec_types.erase(m_npc->m_vec_types.begin());
 			m_npc->updatePkPosion();
 			m_npcOut->updatePkPosion();
