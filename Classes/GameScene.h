@@ -1,8 +1,7 @@
 #pragma 
 
 #include "cocos2d.h"
-#include "GameLayer.h"
- 
+#include "ChoosePlayTypeLayer.h" 
 
 using namespace cocos2d;
 using namespace CocosDenshion;
@@ -17,6 +16,6 @@ public:
 
 	CREATE_FUNC(GameScene);
 public:
-	GameLayer* gameLayer;
 
+	ChoosePlayTypeLayer* gameLayer;
 };

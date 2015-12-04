@@ -6,8 +6,7 @@
 
 USING_NS_CC;
 
-
-
+//µ¥»úÓÎÏ·
 class GameLayer : public CCLayer
 {
 public:

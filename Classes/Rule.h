@@ -2,13 +2,13 @@
 #pragma once
 
 #include "cocos2d.h"
-
 #include "Global.h"
 #include <vector>
 
 USING_NS_CC;
 using namespace  std;
 
+//npc AI 以及 游戏牌型判断
 struct PkHandleTypeStruct//出牌类型
 {
 	CARD_TYPE type;

@@ -12,7 +12,8 @@ bool GameScene::init(){
 	if(!Scene::init()){
 		return false;
 	}
-	gameLayer = GameLayer::create();
+
+	gameLayer = ChoosePlayTypeLayer::create();
 	if(gameLayer == NULL){
 		return false;
 	}
