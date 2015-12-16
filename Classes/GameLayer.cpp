@@ -280,7 +280,6 @@ void GameLayer::menuHandle(CCObject* sender){
 	if (result == ERROR_PK)
 		return;
 
-
 	m_npcOne->setIsOutPk(false);
 	m_npcTwo->setIsOutPk(false);
 	m_player->setIsOutPk(true);

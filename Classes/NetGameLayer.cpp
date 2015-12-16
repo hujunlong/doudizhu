@@ -1,7 +1,8 @@
 #include "NetGameLayer.h"
  
 NetGameLayer::NetGameLayer(){
-	
+	text_name = MyTextFieldTTF::create();
+	text_pwd = MyTextFieldTTF::create();
 }
 
 NetGameLayer::~NetGameLayer(){
@@ -16,7 +17,7 @@ bool NetGameLayer::init(){
 	initBackGround();
 	CreateNetWork();
 	GetLoginInfo();
-	 return true; 
+	return true; 
 }
  
 
@@ -36,33 +37,17 @@ void NetGameLayer::CreateNetWork(){
 }
 
 bool NetGameLayer::GetLoginInfo(){
-	std::fstream file_;
-	std::string path = cocos2d::FileUtils::getInstance()->getWritablePath();
-	path += "/login.txt";
-	file_.open(path,std::ios::in);
+	CCSize winSize = CCDirector::sharedDirector()->getWinSize();
+	const char *tip;
+	Dictionary* strings = Dictionary::createWithContentsOfFile("strings.xml");
 
-	if (!file_)//不存在 先创建注册
-	{
-		auto s = Director::getInstance()->getWinSize();
-		//用户名
-		auto text_name = TextFieldTTF::textFieldWithPlaceHolder("<click here for name>",
-			"Thonburi.ttf",30);
-		text_name->setPosition(Vec2(s.width / 2-50, s.height / 2 + 30));
-		this->addChild(text_name);
-		setTouchMode(kCCTouchesOneByOne);
-		setTouchEnabled(true);
+ 	tip = ((String*)strings->objectForKey("user_name"))->getCString();
+	text_name->CreateText(tip,ccp(winSize.width / 2 - 50, winSize.height / 2+20));
+ 	addChild(text_name,2);
 
-		//密码
-		auto text_pwd = TextFieldTTF::textFieldWithPlaceHolder("<click here for pwd>",
-			"Thonburi.ttf",30);
-		text_pwd->setPosition(Vec2(s.width / 2 - 50, s.height / 2 ));
-		this->addChild(text_pwd);
+	tip = ((String*)strings->objectForKey("pass_world"))->getCString();
+	text_pwd->CreateText(tip,ccp(winSize.width / 2 - 50, winSize.height / 2-20));
+	addChild(text_pwd,1);
 
-	}else{//读取文件的name pwd
-		std::ifstream infile;
-		infile>>login_info.name;
-		infile>>login_info.pwd;
-		return true;
-	}
 	return false;
 }
