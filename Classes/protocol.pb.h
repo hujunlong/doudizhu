@@ -96,23 +96,23 @@ class S2SSystem_GetType : public ::google::protobuf::Message {
 
   // accessors -------------------------------------------------------
 
-  // optional int32 type = 1;
-  inline bool has_type() const;
-  inline void clear_type();
-  static const int kTypeFieldNumber = 1;
-  inline ::google::protobuf::int32 type() const;
-  inline void set_type(::google::protobuf::int32 value);
+  // optional int32 pid = 1;
+  inline bool has_pid() const;
+  inline void clear_pid();
+  static const int kPidFieldNumber = 1;
+  inline ::google::protobuf::int32 pid() const;
+  inline void set_pid(::google::protobuf::int32 value);
 
   // @@protoc_insertion_point(class_scope:protocol.S2SSystem.GetType)
  private:
-  inline void set_has_type();
-  inline void clear_has_type();
+  inline void set_has_pid();
+  inline void clear_has_pid();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
   ::google::protobuf::uint32 _has_bits_[1];
   mutable int _cached_size_;
-  ::google::protobuf::int32 type_;
+  ::google::protobuf::int32 pid_;
   friend void  protobuf_AddDesc_protocol_2eproto();
   friend void protobuf_AssignDesc_protocol_2eproto();
   friend void protobuf_ShutdownFile_protocol_2eproto();
@@ -175,12 +175,12 @@ class S2SSystem_LoginInfo : public ::google::protobuf::Message {
 
   // accessors -------------------------------------------------------
 
-  // optional int32 type = 1;
-  inline bool has_type() const;
-  inline void clear_type();
-  static const int kTypeFieldNumber = 1;
-  inline ::google::protobuf::int32 type() const;
-  inline void set_type(::google::protobuf::int32 value);
+  // optional int32 pid = 1;
+  inline bool has_pid() const;
+  inline void clear_pid();
+  static const int kPidFieldNumber = 1;
+  inline ::google::protobuf::int32 pid() const;
+  inline void set_pid(::google::protobuf::int32 value);
 
   // optional string name = 2;
   inline bool has_name() const;
@@ -208,8 +208,8 @@ class S2SSystem_LoginInfo : public ::google::protobuf::Message {
 
   // @@protoc_insertion_point(class_scope:protocol.S2SSystem.LoginInfo)
  private:
-  inline void set_has_type();
-  inline void clear_has_type();
+  inline void set_has_pid();
+  inline void clear_has_pid();
   inline void set_has_name();
   inline void clear_has_name();
   inline void set_has_passworld();
@@ -221,7 +221,7 @@ class S2SSystem_LoginInfo : public ::google::protobuf::Message {
   mutable int _cached_size_;
   ::std::string* name_;
   ::std::string* passworld_;
-  ::google::protobuf::int32 type_;
+  ::google::protobuf::int32 pid_;
   friend void  protobuf_AddDesc_protocol_2eproto();
   friend void protobuf_AssignDesc_protocol_2eproto();
   friend void protobuf_ShutdownFile_protocol_2eproto();
@@ -284,12 +284,12 @@ class S2SSystem_RegisterInfo : public ::google::protobuf::Message {
 
   // accessors -------------------------------------------------------
 
-  // optional int32 type = 1;
-  inline bool has_type() const;
-  inline void clear_type();
-  static const int kTypeFieldNumber = 1;
-  inline ::google::protobuf::int32 type() const;
-  inline void set_type(::google::protobuf::int32 value);
+  // optional int32 pid = 1;
+  inline bool has_pid() const;
+  inline void clear_pid();
+  static const int kPidFieldNumber = 1;
+  inline ::google::protobuf::int32 pid() const;
+  inline void set_pid(::google::protobuf::int32 value);
 
   // optional string name = 2;
   inline bool has_name() const;
@@ -331,8 +331,8 @@ class S2SSystem_RegisterInfo : public ::google::protobuf::Message {
 
   // @@protoc_insertion_point(class_scope:protocol.S2SSystem.RegisterInfo)
  private:
-  inline void set_has_type();
-  inline void clear_has_type();
+  inline void set_has_pid();
+  inline void clear_has_pid();
   inline void set_has_name();
   inline void clear_has_name();
   inline void set_has_age();
@@ -347,7 +347,7 @@ class S2SSystem_RegisterInfo : public ::google::protobuf::Message {
   ::google::protobuf::uint32 _has_bits_[1];
   mutable int _cached_size_;
   ::std::string* name_;
-  ::google::protobuf::int32 type_;
+  ::google::protobuf::int32 pid_;
   ::google::protobuf::int32 age_;
   ::std::string* passworld_;
   ::google::protobuf::int32 sex_;
@@ -413,12 +413,12 @@ class S2SSystem_Request : public ::google::protobuf::Message {
 
   // accessors -------------------------------------------------------
 
-  // optional int32 type = 1;
-  inline bool has_type() const;
-  inline void clear_type();
-  static const int kTypeFieldNumber = 1;
-  inline ::google::protobuf::int32 type() const;
-  inline void set_type(::google::protobuf::int32 value);
+  // optional int32 pid = 1;
+  inline bool has_pid() const;
+  inline void clear_pid();
+  static const int kPidFieldNumber = 1;
+  inline ::google::protobuf::int32 pid() const;
+  inline void set_pid(::google::protobuf::int32 value);
 
   // optional int32 result = 2;
   inline bool has_result() const;
@@ -429,8 +429,8 @@ class S2SSystem_Request : public ::google::protobuf::Message {
 
   // @@protoc_insertion_point(class_scope:protocol.S2SSystem.Request)
  private:
-  inline void set_has_type();
-  inline void clear_has_type();
+  inline void set_has_pid();
+  inline void clear_has_pid();
   inline void set_has_result();
   inline void clear_has_result();
 
@@ -438,7 +438,7 @@ class S2SSystem_Request : public ::google::protobuf::Message {
 
   ::google::protobuf::uint32 _has_bits_[1];
   mutable int _cached_size_;
-  ::google::protobuf::int32 type_;
+  ::google::protobuf::int32 pid_;
   ::google::protobuf::int32 result_;
   friend void  protobuf_AddDesc_protocol_2eproto();
   friend void protobuf_AssignDesc_protocol_2eproto();
@@ -502,17 +502,17 @@ class S2SSystem_ResultChatMsg : public ::google::protobuf::Message {
 
   // accessors -------------------------------------------------------
 
-  // repeated int32 type = 1;
-  inline int type_size() const;
-  inline void clear_type();
-  static const int kTypeFieldNumber = 1;
-  inline ::google::protobuf::int32 type(int index) const;
-  inline void set_type(int index, ::google::protobuf::int32 value);
-  inline void add_type(::google::protobuf::int32 value);
+  // repeated int32 pid = 1;
+  inline int pid_size() const;
+  inline void clear_pid();
+  static const int kPidFieldNumber = 1;
+  inline ::google::protobuf::int32 pid(int index) const;
+  inline void set_pid(int index, ::google::protobuf::int32 value);
+  inline void add_pid(::google::protobuf::int32 value);
   inline const ::google::protobuf::RepeatedField< ::google::protobuf::int32 >&
-      type() const;
+      pid() const;
   inline ::google::protobuf::RepeatedField< ::google::protobuf::int32 >*
-      mutable_type();
+      mutable_pid();
 
   // repeated string playername = 2;
   inline int playername_size() const;
@@ -553,7 +553,7 @@ class S2SSystem_ResultChatMsg : public ::google::protobuf::Message {
 
   ::google::protobuf::uint32 _has_bits_[1];
   mutable int _cached_size_;
-  ::google::protobuf::RepeatedField< ::google::protobuf::int32 > type_;
+  ::google::protobuf::RepeatedField< ::google::protobuf::int32 > pid_;
   ::google::protobuf::RepeatedPtrField< ::std::string> playername_;
   ::google::protobuf::RepeatedPtrField< ::std::string> msg_;
   friend void  protobuf_AddDesc_protocol_2eproto();
@@ -618,12 +618,12 @@ class S2SSystem_ResultInfo : public ::google::protobuf::Message {
 
   // accessors -------------------------------------------------------
 
-  // optional int32 type = 1;
-  inline bool has_type() const;
-  inline void clear_type();
-  static const int kTypeFieldNumber = 1;
-  inline ::google::protobuf::int32 type() const;
-  inline void set_type(::google::protobuf::int32 value);
+  // optional int32 pid = 1;
+  inline bool has_pid() const;
+  inline void clear_pid();
+  static const int kPidFieldNumber = 1;
+  inline ::google::protobuf::int32 pid() const;
+  inline void set_pid(::google::protobuf::int32 value);
 
   // optional int32 result = 2;
   inline bool has_result() const;
@@ -634,8 +634,8 @@ class S2SSystem_ResultInfo : public ::google::protobuf::Message {
 
   // @@protoc_insertion_point(class_scope:protocol.S2SSystem.ResultInfo)
  private:
-  inline void set_has_type();
-  inline void clear_has_type();
+  inline void set_has_pid();
+  inline void clear_has_pid();
   inline void set_has_result();
   inline void clear_has_result();
 
@@ -643,7 +643,7 @@ class S2SSystem_ResultInfo : public ::google::protobuf::Message {
 
   ::google::protobuf::uint32 _has_bits_[1];
   mutable int _cached_size_;
-  ::google::protobuf::int32 type_;
+  ::google::protobuf::int32 pid_;
   ::google::protobuf::int32 result_;
   friend void  protobuf_AddDesc_protocol_2eproto();
   friend void protobuf_AssignDesc_protocol_2eproto();
@@ -735,56 +735,56 @@ class S2SSystem : public ::google::protobuf::Message {
 
 // S2SSystem_GetType
 
-// optional int32 type = 1;
-inline bool S2SSystem_GetType::has_type() const {
+// optional int32 pid = 1;
+inline bool S2SSystem_GetType::has_pid() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void S2SSystem_GetType::set_has_type() {
+inline void S2SSystem_GetType::set_has_pid() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void S2SSystem_GetType::clear_has_type() {
+inline void S2SSystem_GetType::clear_has_pid() {
   _has_bits_[0] &= ~0x00000001u;
 }
-inline void S2SSystem_GetType::clear_type() {
-  type_ = 0;
-  clear_has_type();
+inline void S2SSystem_GetType::clear_pid() {
+  pid_ = 0;
+  clear_has_pid();
 }
-inline ::google::protobuf::int32 S2SSystem_GetType::type() const {
-  // @@protoc_insertion_point(field_get:protocol.S2SSystem.GetType.type)
-  return type_;
+inline ::google::protobuf::int32 S2SSystem_GetType::pid() const {
+  // @@protoc_insertion_point(field_get:protocol.S2SSystem.GetType.pid)
+  return pid_;
 }
-inline void S2SSystem_GetType::set_type(::google::protobuf::int32 value) {
-  set_has_type();
-  type_ = value;
-  // @@protoc_insertion_point(field_set:protocol.S2SSystem.GetType.type)
+inline void S2SSystem_GetType::set_pid(::google::protobuf::int32 value) {
+  set_has_pid();
+  pid_ = value;
+  // @@protoc_insertion_point(field_set:protocol.S2SSystem.GetType.pid)
 }
 
 // -------------------------------------------------------------------
 
 // S2SSystem_LoginInfo
 
-// optional int32 type = 1;
-inline bool S2SSystem_LoginInfo::has_type() const {
+// optional int32 pid = 1;
+inline bool S2SSystem_LoginInfo::has_pid() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void S2SSystem_LoginInfo::set_has_type() {
+inline void S2SSystem_LoginInfo::set_has_pid() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void S2SSystem_LoginInfo::clear_has_type() {
+inline void S2SSystem_LoginInfo::clear_has_pid() {
   _has_bits_[0] &= ~0x00000001u;
 }
-inline void S2SSystem_LoginInfo::clear_type() {
-  type_ = 0;
-  clear_has_type();
+inline void S2SSystem_LoginInfo::clear_pid() {
+  pid_ = 0;
+  clear_has_pid();
 }
-inline ::google::protobuf::int32 S2SSystem_LoginInfo::type() const {
-  // @@protoc_insertion_point(field_get:protocol.S2SSystem.LoginInfo.type)
-  return type_;
+inline ::google::protobuf::int32 S2SSystem_LoginInfo::pid() const {
+  // @@protoc_insertion_point(field_get:protocol.S2SSystem.LoginInfo.pid)
+  return pid_;
 }
-inline void S2SSystem_LoginInfo::set_type(::google::protobuf::int32 value) {
-  set_has_type();
-  type_ = value;
-  // @@protoc_insertion_point(field_set:protocol.S2SSystem.LoginInfo.type)
+inline void S2SSystem_LoginInfo::set_pid(::google::protobuf::int32 value) {
+  set_has_pid();
+  pid_ = value;
+  // @@protoc_insertion_point(field_set:protocol.S2SSystem.LoginInfo.pid)
 }
 
 // optional string name = 2;
@@ -943,28 +943,28 @@ inline void S2SSystem_LoginInfo::set_allocated_passworld(::std::string* passworl
 
 // S2SSystem_RegisterInfo
 
-// optional int32 type = 1;
-inline bool S2SSystem_RegisterInfo::has_type() const {
+// optional int32 pid = 1;
+inline bool S2SSystem_RegisterInfo::has_pid() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void S2SSystem_RegisterInfo::set_has_type() {
+inline void S2SSystem_RegisterInfo::set_has_pid() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void S2SSystem_RegisterInfo::clear_has_type() {
+inline void S2SSystem_RegisterInfo::clear_has_pid() {
   _has_bits_[0] &= ~0x00000001u;
 }
-inline void S2SSystem_RegisterInfo::clear_type() {
-  type_ = 0;
-  clear_has_type();
+inline void S2SSystem_RegisterInfo::clear_pid() {
+  pid_ = 0;
+  clear_has_pid();
 }
-inline ::google::protobuf::int32 S2SSystem_RegisterInfo::type() const {
-  // @@protoc_insertion_point(field_get:protocol.S2SSystem.RegisterInfo.type)
-  return type_;
+inline ::google::protobuf::int32 S2SSystem_RegisterInfo::pid() const {
+  // @@protoc_insertion_point(field_get:protocol.S2SSystem.RegisterInfo.pid)
+  return pid_;
 }
-inline void S2SSystem_RegisterInfo::set_type(::google::protobuf::int32 value) {
-  set_has_type();
-  type_ = value;
-  // @@protoc_insertion_point(field_set:protocol.S2SSystem.RegisterInfo.type)
+inline void S2SSystem_RegisterInfo::set_pid(::google::protobuf::int32 value) {
+  set_has_pid();
+  pid_ = value;
+  // @@protoc_insertion_point(field_set:protocol.S2SSystem.RegisterInfo.pid)
 }
 
 // optional string name = 2;
@@ -1171,28 +1171,28 @@ inline void S2SSystem_RegisterInfo::set_sex(::google::protobuf::int32 value) {
 
 // S2SSystem_Request
 
-// optional int32 type = 1;
-inline bool S2SSystem_Request::has_type() const {
+// optional int32 pid = 1;
+inline bool S2SSystem_Request::has_pid() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void S2SSystem_Request::set_has_type() {
+inline void S2SSystem_Request::set_has_pid() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void S2SSystem_Request::clear_has_type() {
+inline void S2SSystem_Request::clear_has_pid() {
   _has_bits_[0] &= ~0x00000001u;
 }
-inline void S2SSystem_Request::clear_type() {
-  type_ = 0;
-  clear_has_type();
+inline void S2SSystem_Request::clear_pid() {
+  pid_ = 0;
+  clear_has_pid();
 }
-inline ::google::protobuf::int32 S2SSystem_Request::type() const {
-  // @@protoc_insertion_point(field_get:protocol.S2SSystem.Request.type)
-  return type_;
+inline ::google::protobuf::int32 S2SSystem_Request::pid() const {
+  // @@protoc_insertion_point(field_get:protocol.S2SSystem.Request.pid)
+  return pid_;
 }
-inline void S2SSystem_Request::set_type(::google::protobuf::int32 value) {
-  set_has_type();
-  type_ = value;
-  // @@protoc_insertion_point(field_set:protocol.S2SSystem.Request.type)
+inline void S2SSystem_Request::set_pid(::google::protobuf::int32 value) {
+  set_has_pid();
+  pid_ = value;
+  // @@protoc_insertion_point(field_set:protocol.S2SSystem.Request.pid)
 }
 
 // optional int32 result = 2;
@@ -1223,34 +1223,34 @@ inline void S2SSystem_Request::set_result(::google::protobuf::int32 value) {
 
 // S2SSystem_ResultChatMsg
 
-// repeated int32 type = 1;
-inline int S2SSystem_ResultChatMsg::type_size() const {
-  return type_.size();
+// repeated int32 pid = 1;
+inline int S2SSystem_ResultChatMsg::pid_size() const {
+  return pid_.size();
 }
-inline void S2SSystem_ResultChatMsg::clear_type() {
-  type_.Clear();
+inline void S2SSystem_ResultChatMsg::clear_pid() {
+  pid_.Clear();
 }
-inline ::google::protobuf::int32 S2SSystem_ResultChatMsg::type(int index) const {
-  // @@protoc_insertion_point(field_get:protocol.S2SSystem.ResultChatMsg.type)
-  return type_.Get(index);
+inline ::google::protobuf::int32 S2SSystem_ResultChatMsg::pid(int index) const {
+  // @@protoc_insertion_point(field_get:protocol.S2SSystem.ResultChatMsg.pid)
+  return pid_.Get(index);
 }
-inline void S2SSystem_ResultChatMsg::set_type(int index, ::google::protobuf::int32 value) {
-  type_.Set(index, value);
-  // @@protoc_insertion_point(field_set:protocol.S2SSystem.ResultChatMsg.type)
+inline void S2SSystem_ResultChatMsg::set_pid(int index, ::google::protobuf::int32 value) {
+  pid_.Set(index, value);
+  // @@protoc_insertion_point(field_set:protocol.S2SSystem.ResultChatMsg.pid)
 }
-inline void S2SSystem_ResultChatMsg::add_type(::google::protobuf::int32 value) {
-  type_.Add(value);
-  // @@protoc_insertion_point(field_add:protocol.S2SSystem.ResultChatMsg.type)
+inline void S2SSystem_ResultChatMsg::add_pid(::google::protobuf::int32 value) {
+  pid_.Add(value);
+  // @@protoc_insertion_point(field_add:protocol.S2SSystem.ResultChatMsg.pid)
 }
 inline const ::google::protobuf::RepeatedField< ::google::protobuf::int32 >&
-S2SSystem_ResultChatMsg::type() const {
-  // @@protoc_insertion_point(field_list:protocol.S2SSystem.ResultChatMsg.type)
-  return type_;
+S2SSystem_ResultChatMsg::pid() const {
+  // @@protoc_insertion_point(field_list:protocol.S2SSystem.ResultChatMsg.pid)
+  return pid_;
 }
 inline ::google::protobuf::RepeatedField< ::google::protobuf::int32 >*
-S2SSystem_ResultChatMsg::mutable_type() {
-  // @@protoc_insertion_point(field_mutable_list:protocol.S2SSystem.ResultChatMsg.type)
-  return &type_;
+S2SSystem_ResultChatMsg::mutable_pid() {
+  // @@protoc_insertion_point(field_mutable_list:protocol.S2SSystem.ResultChatMsg.pid)
+  return &pid_;
 }
 
 // repeated string playername = 2;
@@ -1365,28 +1365,28 @@ S2SSystem_ResultChatMsg::mutable_msg() {
 
 // S2SSystem_ResultInfo
 
-// optional int32 type = 1;
-inline bool S2SSystem_ResultInfo::has_type() const {
+// optional int32 pid = 1;
+inline bool S2SSystem_ResultInfo::has_pid() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void S2SSystem_ResultInfo::set_has_type() {
+inline void S2SSystem_ResultInfo::set_has_pid() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void S2SSystem_ResultInfo::clear_has_type() {
+inline void S2SSystem_ResultInfo::clear_has_pid() {
   _has_bits_[0] &= ~0x00000001u;
 }
-inline void S2SSystem_ResultInfo::clear_type() {
-  type_ = 0;
-  clear_has_type();
+inline void S2SSystem_ResultInfo::clear_pid() {
+  pid_ = 0;
+  clear_has_pid();
 }
-inline ::google::protobuf::int32 S2SSystem_ResultInfo::type() const {
-  // @@protoc_insertion_point(field_get:protocol.S2SSystem.ResultInfo.type)
-  return type_;
+inline ::google::protobuf::int32 S2SSystem_ResultInfo::pid() const {
+  // @@protoc_insertion_point(field_get:protocol.S2SSystem.ResultInfo.pid)
+  return pid_;
 }
-inline void S2SSystem_ResultInfo::set_type(::google::protobuf::int32 value) {
-  set_has_type();
-  type_ = value;
-  // @@protoc_insertion_point(field_set:protocol.S2SSystem.ResultInfo.type)
+inline void S2SSystem_ResultInfo::set_pid(::google::protobuf::int32 value) {
+  set_has_pid();
+  pid_ = value;
+  // @@protoc_insertion_point(field_set:protocol.S2SSystem.ResultInfo.pid)
 }
 
 // optional int32 result = 2;

@@ -14,7 +14,6 @@ ODSocket::ODSocket(SOCKET sock)
 
 ODSocket::~ODSocket()
 {
-
 }
 
 int ODSocket::Init()

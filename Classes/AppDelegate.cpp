@@ -3,6 +3,7 @@
 
 USING_NS_CC;
 
+ODSocket cSocket;
 AppDelegate::AppDelegate() {
 
 }
@@ -23,6 +24,8 @@ bool AppDelegate::applicationDidFinishLaunching() {
     
 
 	setResourceSearchResolution();
+
+	createNetWork();
 
 	 // turn on display FPS
     director->setDisplayStats(true);
@@ -56,7 +59,13 @@ void AppDelegate::applicationWillEnterForeground() {
 }
 
 void AppDelegate::setResourceSearchResolution(){ //用来添加Cocostudio所创建的资源
-	//std::vector<std::string> paths;
-	//paths.push_back("font");
-	//FileUtils::getInstance()->setSearchResolutionsOrder(paths);
+	std::vector<std::string> paths;
+	paths.push_back("login");
+	FileUtils::getInstance()->setSearchResolutionsOrder(paths);
+}
+
+void AppDelegate::createNetWork(){
+	cSocket.Init();
+	cSocket.Create(AF_INET,SOCK_STREAM,0);
+	cSocket.Connect("127.0.0.1",8087);
 }

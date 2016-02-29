@@ -1,13 +1,16 @@
 #pragma once
 #include <vector>
-using namespace std;
+#include "MySocket.h"
 
+using namespace std;
 const int pkWidth = 71;//牌的宽度
 const int pkHeight = 96;//牌的高度
 const int pkDistance = 20;//牌与牌的间距
 const int pkTopHeight = 10;//牌点击向上移动距离
 const int menu_score_top = 88;//叫分向上位置高度
 const int menu_score_distance = 20;//叫分间距
+
+
 //花色
 enum PKType
 {
@@ -86,3 +89,20 @@ struct PkStruct //牌 类型 大小
 	int pk_num;
 };
 
+enum TypeId{
+	GetTypeID = 0,
+	LoginInfoID = 1,
+	RegisterInfoID = 2,
+	RequestID = 3,
+	ResultChatMsgID = 4,
+	ResultInfoID = 5,
+};
+
+enum Result{
+	REGISTERSUCCESS = 0, //注册成功
+	REGISTERERROR   = 1, //注册错误
+	LOGINERROR      = 2, //登陆错误
+	PASSWDERROR     = 3, //密码错误
+	SAMENICK        = 4, //注册名字相同
+	LOGINSUCCESS    = 5, //登陆成功
+};

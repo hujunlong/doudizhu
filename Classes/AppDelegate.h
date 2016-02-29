@@ -8,6 +8,7 @@
 
 The reason for implement as private inheritance is to hide some interface call by Director.
 */
+
 class  AppDelegate : private cocos2d::Application
 {
 public:
@@ -34,6 +35,8 @@ public:
     virtual void applicationWillEnterForeground();
 
 	void setResourceSearchResolution();
+
+	void createNetWork();
 };
 
 #endif // _APP_DELEGATE_H_

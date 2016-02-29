@@ -4,7 +4,7 @@
 #include "cocos2d.h"
 USING_NS_CC;
 
-class MyTextFieldTTF : public CCLayer
+class MyTextFieldTTF : public CCLayer,public CCTextFieldDelegate
 {
 public:
 	bool init();  
