@@ -1,0 +1,31 @@
+package protocol;
+
+message S2SSystem {
+	
+	message GetType{
+		optional int32 pid = 1;
+	}
+	
+	message LoginInfo{
+		optional int32 pid = 1 ;//id = 1
+		optional string playername = 2;  
+		optional string passworld = 3;
+	}
+
+	message RegisterPlayer {
+		optional int32 pid = 1; //id = 2
+		optional string playername = 2;
+		optional string passworld = 3;
+	}
+	
+	message LoginResult {
+		optional int32 pid = 1;//id 3
+		optional int32 result = 2;
+		optional string balanceserver = 3; 
+	}
+	
+	message RegisterResult {
+		optional int32 pid = 1;//id 4
+		optional int32 result = 2;
+	}
+}
