@@ -21,7 +21,8 @@ message S2SSystem {
 	message LoginResult {
 		optional int32 pid = 1;//id 3
 		optional int32 result = 2;
-		optional string balanceserver = 3; 
+		optional string balanceserver = 3;
+		optional int32 player_id = 4;	
 	}
 	
 	message RegisterResult {

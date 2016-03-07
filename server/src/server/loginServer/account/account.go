@@ -2,53 +2,30 @@ package account
 
 import (
 	"fmt"
-	config "github.com/game_engine/i18n"
+	"github.com/game_engine/i18n"
 	"github.com/game_engine/logs"
 	"github.com/game_engine/orm"
 	_ "github.com/go-sql-driver/mysql"
 	"server/share/global"
 	"strconv"
+	"strings"
 )
 
 var o orm.Ormer
-var count int //现在最大的playerid
+var count int32 //现在最大的playerid
 var Log *logs.BeeLogger
 var account_log_max int64
-var BlanceAddress string
-var ListenAddress string
+var Listen4CAddress string
+var Listen4GameAddress string
 var mysql_address string
+var NewServerAddress map[string]string
 
 func init() {
-
 	setLog()
 	readConfig()
-	// set default database
-	err := orm.RegisterDataBase("default", "mysql", mysql_address)
-	if err != nil {
-		Log.Error(err.Error())
-	}
-
-	// register model
-	orm.RegisterModel(new(LoginBase), new(ForBid))
-
-	// create table
-	orm.RunSyncdb("default", false, true)
-
-	o = orm.NewOrm()
-
+	OpenNewServerConfig()
+	dbConfig()
 	count = getMaxId()
-}
-
-func readConfig() {
-	err := config.GetInit("./account_cfg.ini")
-	if err == nil {
-		account_log_max, _ = strconv.ParseInt(config.Data["account_log_max"].(string), 10, 64)
-		ListenAddress = config.Data["login_listen_ip"].(string) + ":" + config.Data["login_port"].(string)
-		BlanceAddress = config.Data["balance_server"].(string) + ":" + config.Data["balance_port"].(string)
-		mysql_address = config.Data["mysql_user"].(string) + ":" + config.Data["mysql_pwd"].(string) + "@tcp(" + config.Data["mysql_ip"].(string) + ":" + config.Data["mysql_port"].(string) + ")/" + config.Data["mysql_db"].(string) + "?charset=utf8"
-	} else {
-		Log.Error(err.Error())
-	}
 }
 
 func setLog() {
@@ -60,7 +37,42 @@ func setLog() {
 	}
 }
 
-func getMaxId() int {
+func readConfig() {
+	err := il8n.GetInit("./account_cfg.ini")
+	if err == nil {
+		account_log_max, _ = strconv.ParseInt(il8n.Data["account_log_max"].(string), 10, 64)
+		Listen4CAddress = il8n.Data["login_listen_4c_ip"].(string)
+		Listen4GameAddress = il8n.Data["login_listen_4game_ip"].(string)
+		mysql_address = il8n.Data["mysql_user"].(string) + ":" + il8n.Data["mysql_pwd"].(string) + "@tcp(" + il8n.Data["mysql_ip"].(string) + ":" + il8n.Data["mysql_port"].(string) + ")/" + il8n.Data["mysql_db"].(string) + "?charset=utf8"
+	} else {
+		Log.Error(err.Error())
+	}
+}
+
+func OpenNewServerConfig() {
+	NewServerAddress = make(map[string]string)
+
+	for k, v := range il8n.Data {
+		if strings.Contains(k.(string), "new_server_") {
+			NewServerAddress[v.(string)] = v.(string)
+		}
+	}
+}
+
+func dbConfig() {
+	// set default database
+	err := orm.RegisterDataBase("default", "mysql", mysql_address)
+	if err != nil {
+		Log.Error(err.Error())
+	}
+	// register model
+	orm.RegisterModel(new(LoginBase), new(ForBid))
+	// create table
+	orm.RunSyncdb("default", false, true)
+	o = orm.NewOrm()
+}
+
+func getMaxId() int32 {
 	var count int = 0
 	var maps []orm.Params
 	num, err := o.Raw("select max(player_id) from login_base").Values(&maps)
@@ -71,7 +83,7 @@ func getMaxId() int {
 		}
 	}
 	Log.Trace("getMaxId = %d", count)
-	return count
+	return int32(count)
 }
 
 func Register(name string, pwd string) int32 {
@@ -90,21 +102,21 @@ func Register(name string, pwd string) int32 {
 	return global.SAMENICK
 }
 
-func VerifyLogin(name string, pwd string) int32 {
+func VerifyLogin(name string, pwd string) (result int32, player_id int32) {
 	user := LoginBase{PlayerName: name, PlayerPwd: pwd}
 	err := o.Read(&user, "PlayerName", "PlayerPwd")
 
 	if err != nil {
 		Log.Trace("name = %s pwd = %s login error", name, pwd)
-		return global.LOGINERROR
+		return global.LOGINERROR, 0
 	}
 
 	for_bid := ForBid{UserId: user.PlayerId}
 	err = o.Read(&for_bid, "UserId")
 	if err == orm.ErrNoRows {
-		return global.LOGINSUCCESS
+		return global.LOGINSUCCESS, user.PlayerId
 	}
 
 	Log.Trace("name = %s pwd = %s login forbid", name, pwd)
-	return global.FORBIDLOGIN
+	return global.FORBIDLOGIN, 0
 }

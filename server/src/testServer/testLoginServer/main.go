@@ -16,7 +16,7 @@ import (
 
 var log *logs.BeeLogger
 
-const max_client = 20000
+const max_client = 100000
 
 var end = make(chan int)
 
@@ -84,7 +84,7 @@ func ReciveResult(conn net.Conn, i int, recive_result chan int) {
 			if err := proto.Unmarshal(buf[0:n], result); err == nil {
 				switch result.GetResult() {
 				case global.LOGINSUCCESS:
-					log.Info("login sucessfull")
+					log.Info("login sucessfull and player id = %d", result.GetPlayerId())
 				default:
 					log.Error("login error")
 				}
@@ -128,16 +128,22 @@ type ConnStruct struct {
 }
 
 func main() {
+
 	var arrayConnStruct [max_client]ConnStruct
 	var err error
 	for i := 0; i < max_client; i++ {
+
 		arrayConnStruct[i].conn, err = net.Dial("tcp", "127.0.0.1:8080")
 		if err != nil {
 			log.Error("connect error %s", err)
 			return
 		}
 		go MessageRun(arrayConnStruct[i].conn, i)
+
 		time.Sleep(5 * time.Millisecond)
+
 	}
+
 	<-end
+
 }

@@ -112,6 +112,7 @@ type S2SSystem_LoginResult struct {
 	Pid              *int32  `protobuf:"varint,1,opt,name=pid" json:"pid,omitempty"`
 	Result           *int32  `protobuf:"varint,2,opt,name=result" json:"result,omitempty"`
 	Balanceserver    *string `protobuf:"bytes,3,opt,name=balanceserver" json:"balanceserver,omitempty"`
+	PlayerId         *int32  `protobuf:"varint,4,opt,name=player_id" json:"player_id,omitempty"`
 	XXX_unrecognized []byte  `json:"-"`
 }
 
@@ -138,6 +139,13 @@ func (m *S2SSystem_LoginResult) GetBalanceserver() string {
 		return *m.Balanceserver
 	}
 	return ""
+}
+
+func (m *S2SSystem_LoginResult) GetPlayerId() int32 {
+	if m != nil && m.PlayerId != nil {
+		return *m.PlayerId
+	}
+	return 0
 }
 
 type S2SSystem_RegisterResult struct {

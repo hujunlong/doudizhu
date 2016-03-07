@@ -9,9 +9,14 @@ import (
 
 import (
 	"fmt"
-	"io"
 	"net"
 )
+
+var gameConnects map[string]account.Connect4C
+
+func init() {
+	gameConnects = make(map[string]account.Connect4C)
+}
 
 func CheckError(err error) bool {
 	if err != nil {
@@ -21,17 +26,13 @@ func CheckError(err error) bool {
 	return true
 }
 
-func Handler(conn net.Conn) {
+func Handler4C(conn net.Conn) {
 	defer conn.Close()
 	const MAXLEN = 1024
 	buf := make([]byte, MAXLEN)
 	for {
 		n, err := conn.Read(buf) //接收具体消息
-		if err == io.EOF {
-			fmt.Println(conn.RemoteAddr(), " closed")
-			conn.Close()
-			return
-		} else if !CheckError(err) {
+		if err != nil {
 			return
 		}
 
@@ -52,17 +53,17 @@ func Handler(conn net.Conn) {
 			//登陆
 			login := new(protocol.S2SSystem_LoginInfo)
 			if err := proto.Unmarshal(buf[0:n], login); err == nil {
-				result := account.VerifyLogin(login.GetPlayername(), login.GetPassworld())
-
+				result, player_id := account.VerifyLogin(login.GetPlayername(), login.GetPassworld())
 				//发送登陆blanceServer地址并断开连接
 				result4C := &protocol.S2SSystem_LoginResult{
-					Pid:    proto.Int32(global.LoginResultId),
-					Result: proto.Int32(result),
+					Pid:      proto.Int32(global.LoginResultId),
+					Result:   proto.Int32(result),
+					PlayerId: proto.Int32(player_id),
 				}
 
 				balanceserver := ""
 				if result == global.LOGINSUCCESS {
-					balanceserver = account.BlanceAddress
+					//balanceserver = account.BlanceAddress
 				}
 				result4C.Balanceserver = &(balanceserver)
 				encObj, _ := proto.Marshal(result4C)
@@ -84,20 +85,73 @@ func Handler(conn net.Conn) {
 				encObj, _ := proto.Marshal(result4C)
 				conn.Write(encObj)
 				account.Log.Info("send register message")
+
+				//给负载均衡发送一个消息 写入注册信息
+
 			}
 		default:
 		}
 	}
 }
 
-func main() {
-	listener, err := net.Listen("tcp", account.ListenAddress)
-	if CheckError(err) {
-		for {
-			conn, err1 := listener.Accept()
-			if CheckError(err1) {
-				go Handler(conn)
-			}
+func Handler4Game(conn net.Conn) {
+	defer func() {
+		conn.Close()
+		delete(gameConnects, conn.RemoteAddr().String())
+	}()
+
+	const MAXLEN = 1024
+	buf := make([]byte, MAXLEN)
+	for {
+		n, err := conn.Read(buf) //接收具体消息
+		if err != nil {
+			return
 		}
+
+		if n > MAXLEN {
+			account.Log.Error("recive error n> MAXLEN")
+			return
+		}
+
 	}
+}
+
+func Deal4Client(listener net.Listener) {
+	conn, err := listener.Accept()
+	if CheckError(err) {
+		go Handler4C(conn)
+	}
+}
+
+func Deal4GameServer(listener net.Listener) {
+	conn, err := listener.Accept()
+	key_value := conn.RemoteAddr().String()
+
+	gameConnects[key_value] = account.Connect4C{
+		key_value,
+		0,
+	}
+
+	if CheckError(err) {
+		go Handler4Game(conn)
+	}
+}
+
+func main() {
+
+	//Deal4Client
+	listener, err := net.Listen("tcp", account.Listen4CAddress)
+
+	//Deal4Game
+	listener2, err2 := net.Listen("tcp", account.Listen4GameAddress)
+
+	if !CheckError(err) || !CheckError(err2) {
+		return
+	}
+
+	for {
+		Deal4Client(listener)
+		Deal4GameServer(listener2)
+	}
+
 }
