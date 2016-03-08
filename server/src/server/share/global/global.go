@@ -24,4 +24,6 @@ const (
 	RegisterInfoId   = 2
 	LoginResultId    = 3
 	RegisterResultId = 4
+	GetGameAccountId = 5
+	GameResultId     = 6
 )

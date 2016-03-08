@@ -1,6 +1,6 @@
 package protocol;
 
-message S2SSystem {
+message Account {
 	
 	message GetType{
 		optional int32 pid = 1;
@@ -21,12 +21,29 @@ message S2SSystem {
 	message LoginResult {
 		optional int32 pid = 1;//id 3
 		optional int32 result = 2;
-		optional string balanceserver = 3;
+		optional string gameserver = 3;
 		optional int32 player_id = 4;	
 	}
 	
 	message RegisterResult {
 		optional int32 pid = 1;//id 4
 		optional int32 result = 2;
+	}
+	
+	message GetGameAccount {
+		optional int32 pid = 1;//id 5
+	}
+	
+	message GameResult {
+		optional int32 pid = 1;//id 6
+		optional int32 count = 2;
+		optional string game_address = 3;
+	}
+}
+
+message Game {
+
+	message GetType{
+		optional int32 pid = 1;
 	}
 }

@@ -56,6 +56,7 @@ func OpenNewServerConfig() {
 		if strings.Contains(k.(string), "new_server_") {
 			NewServerAddress[v.(string)] = v.(string)
 		}
+
 	}
 }
 

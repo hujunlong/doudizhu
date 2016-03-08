@@ -18,6 +18,11 @@ func init() {
 }
 
 func add2Map(str string) {
+	str = strings.TrimSpace(str)
+	if strings.HasPrefix(str, "#") {
+		return
+	}
+
 	strs := strings.Split(str, "=")
 	if len(strs) == 2 {
 		key := strings.TrimSpace(strs[0]) //utf8 无 bom

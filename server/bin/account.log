@@ -304,3 +304,5 @@
 2016/03/07 13:40:42 [main.go:66] [I] send login message
 2016/03/07 13:40:42 [main.go:66] [I] send login message
 2016/03/07 16:25:07 [account.go:77] [D] getMaxId = 20000
+2016/03/08 11:41:22 [account.go:84] [D] getMaxId = 20000
+2016/03/08 11:41:53 [account.go:86] [D] getMaxId = 20000

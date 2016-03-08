@@ -6,6 +6,11 @@ import (
 
 func TestI18n(t *testing.T) {
 	err := GetInit("locale_test.ini")
+
+	if len(Data) != 2 {
+		t.Error("error for #")
+		t.Error(len(Data))
+	}
 	if err != nil {
 		t.Errorf("error:%s", err)
 	}

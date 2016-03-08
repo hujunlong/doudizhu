@@ -36,7 +36,7 @@ func CheckError(err error) bool {
 
 func SendMsgRegister(conn net.Conn, i int) {
 	nick := strconv.Itoa(i)
-	register := &protocol.S2SSystem_RegisterPlayer{
+	register := &protocol.Account_RegisterPlayer{
 		Pid:        proto.Int32(global.RegisterInfoId),
 		Playername: proto.String(nick),
 		Passworld:  proto.String(nick),
@@ -52,7 +52,7 @@ func SendMsgRegister(conn net.Conn, i int) {
 func SenMsgLogin(conn net.Conn, i int) {
 	nick := strconv.Itoa(i)
 	//登陆相关
-	loginInfo := &protocol.S2SSystem_LoginInfo{
+	loginInfo := &protocol.Account_LoginInfo{
 		Pid:        proto.Int32(global.LoginInfoId),
 		Playername: proto.String(nick),
 		Passworld:  proto.String(nick),
@@ -72,7 +72,7 @@ func ReciveResult(conn net.Conn, i int, recive_result chan int) {
 	for true {
 		n, _ := conn.Read(buf) //接收具体消息
 		//接收包的type类型用来区分包之间的区别
-		typeStruct := new(protocol.S2SSystem_GetType)
+		typeStruct := new(protocol.Account_GetType)
 		if err := proto.Unmarshal(buf[0:n], typeStruct); err != nil {
 			CheckError(err)
 		}
@@ -80,7 +80,7 @@ func ReciveResult(conn net.Conn, i int, recive_result chan int) {
 		fmt.Println("*typeStruct.Pid=", *typeStruct.Pid)
 		switch *typeStruct.Pid {
 		case global.LoginResultId:
-			result := new(protocol.S2SSystem_LoginResult)
+			result := new(protocol.Account_LoginResult)
 			if err := proto.Unmarshal(buf[0:n], result); err == nil {
 				switch result.GetResult() {
 				case global.LOGINSUCCESS:
@@ -98,7 +98,7 @@ func ReciveResult(conn net.Conn, i int, recive_result chan int) {
 				return
 			}
 		case global.RegisterResultId:
-			result := new(protocol.S2SSystem_RegisterResult)
+			result := new(protocol.Account_RegisterResult)
 			if err := proto.Unmarshal(buf[0:n], result); err == nil {
 				switch result.GetResult() {
 				case global.REGISTERSUCCESS:
@@ -133,7 +133,7 @@ func main() {
 	var err error
 	for i := 0; i < max_client; i++ {
 
-		arrayConnStruct[i].conn, err = net.Dial("tcp", "127.0.0.1:8080")
+		arrayConnStruct[i].conn, err = net.Dial("tcp", "127.0.0.1:8081")
 		if err != nil {
 			log.Error("connect error %s", err)
 			return

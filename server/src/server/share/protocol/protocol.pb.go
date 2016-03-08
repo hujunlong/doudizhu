@@ -9,7 +9,8 @@ It is generated from these files:
 	protocol.proto
 
 It has these top-level messages:
-	S2SSystem
+	Account
+	Game
 */
 package protocol
 
@@ -20,154 +21,226 @@ import math "math"
 var _ = proto.Marshal
 var _ = math.Inf
 
-type S2SSystem struct {
+type Account struct {
 	XXX_unrecognized []byte `json:"-"`
 }
 
-func (m *S2SSystem) Reset()         { *m = S2SSystem{} }
-func (m *S2SSystem) String() string { return proto.CompactTextString(m) }
-func (*S2SSystem) ProtoMessage()    {}
+func (m *Account) Reset()         { *m = Account{} }
+func (m *Account) String() string { return proto.CompactTextString(m) }
+func (*Account) ProtoMessage()    {}
 
-type S2SSystem_GetType struct {
+type Account_GetType struct {
 	Pid              *int32 `protobuf:"varint,1,opt,name=pid" json:"pid,omitempty"`
 	XXX_unrecognized []byte `json:"-"`
 }
 
-func (m *S2SSystem_GetType) Reset()         { *m = S2SSystem_GetType{} }
-func (m *S2SSystem_GetType) String() string { return proto.CompactTextString(m) }
-func (*S2SSystem_GetType) ProtoMessage()    {}
+func (m *Account_GetType) Reset()         { *m = Account_GetType{} }
+func (m *Account_GetType) String() string { return proto.CompactTextString(m) }
+func (*Account_GetType) ProtoMessage()    {}
 
-func (m *S2SSystem_GetType) GetPid() int32 {
+func (m *Account_GetType) GetPid() int32 {
 	if m != nil && m.Pid != nil {
 		return *m.Pid
 	}
 	return 0
 }
 
-type S2SSystem_LoginInfo struct {
+type Account_LoginInfo struct {
 	Pid              *int32  `protobuf:"varint,1,opt,name=pid" json:"pid,omitempty"`
 	Playername       *string `protobuf:"bytes,2,opt,name=playername" json:"playername,omitempty"`
 	Passworld        *string `protobuf:"bytes,3,opt,name=passworld" json:"passworld,omitempty"`
 	XXX_unrecognized []byte  `json:"-"`
 }
 
-func (m *S2SSystem_LoginInfo) Reset()         { *m = S2SSystem_LoginInfo{} }
-func (m *S2SSystem_LoginInfo) String() string { return proto.CompactTextString(m) }
-func (*S2SSystem_LoginInfo) ProtoMessage()    {}
+func (m *Account_LoginInfo) Reset()         { *m = Account_LoginInfo{} }
+func (m *Account_LoginInfo) String() string { return proto.CompactTextString(m) }
+func (*Account_LoginInfo) ProtoMessage()    {}
 
-func (m *S2SSystem_LoginInfo) GetPid() int32 {
+func (m *Account_LoginInfo) GetPid() int32 {
 	if m != nil && m.Pid != nil {
 		return *m.Pid
 	}
 	return 0
 }
 
-func (m *S2SSystem_LoginInfo) GetPlayername() string {
+func (m *Account_LoginInfo) GetPlayername() string {
 	if m != nil && m.Playername != nil {
 		return *m.Playername
 	}
 	return ""
 }
 
-func (m *S2SSystem_LoginInfo) GetPassworld() string {
+func (m *Account_LoginInfo) GetPassworld() string {
 	if m != nil && m.Passworld != nil {
 		return *m.Passworld
 	}
 	return ""
 }
 
-type S2SSystem_RegisterPlayer struct {
+type Account_RegisterPlayer struct {
 	Pid              *int32  `protobuf:"varint,1,opt,name=pid" json:"pid,omitempty"`
 	Playername       *string `protobuf:"bytes,2,opt,name=playername" json:"playername,omitempty"`
 	Passworld        *string `protobuf:"bytes,3,opt,name=passworld" json:"passworld,omitempty"`
 	XXX_unrecognized []byte  `json:"-"`
 }
 
-func (m *S2SSystem_RegisterPlayer) Reset()         { *m = S2SSystem_RegisterPlayer{} }
-func (m *S2SSystem_RegisterPlayer) String() string { return proto.CompactTextString(m) }
-func (*S2SSystem_RegisterPlayer) ProtoMessage()    {}
+func (m *Account_RegisterPlayer) Reset()         { *m = Account_RegisterPlayer{} }
+func (m *Account_RegisterPlayer) String() string { return proto.CompactTextString(m) }
+func (*Account_RegisterPlayer) ProtoMessage()    {}
 
-func (m *S2SSystem_RegisterPlayer) GetPid() int32 {
+func (m *Account_RegisterPlayer) GetPid() int32 {
 	if m != nil && m.Pid != nil {
 		return *m.Pid
 	}
 	return 0
 }
 
-func (m *S2SSystem_RegisterPlayer) GetPlayername() string {
+func (m *Account_RegisterPlayer) GetPlayername() string {
 	if m != nil && m.Playername != nil {
 		return *m.Playername
 	}
 	return ""
 }
 
-func (m *S2SSystem_RegisterPlayer) GetPassworld() string {
+func (m *Account_RegisterPlayer) GetPassworld() string {
 	if m != nil && m.Passworld != nil {
 		return *m.Passworld
 	}
 	return ""
 }
 
-type S2SSystem_LoginResult struct {
+type Account_LoginResult struct {
 	Pid              *int32  `protobuf:"varint,1,opt,name=pid" json:"pid,omitempty"`
 	Result           *int32  `protobuf:"varint,2,opt,name=result" json:"result,omitempty"`
-	Balanceserver    *string `protobuf:"bytes,3,opt,name=balanceserver" json:"balanceserver,omitempty"`
+	Gameserver       *string `protobuf:"bytes,3,opt,name=gameserver" json:"gameserver,omitempty"`
 	PlayerId         *int32  `protobuf:"varint,4,opt,name=player_id" json:"player_id,omitempty"`
 	XXX_unrecognized []byte  `json:"-"`
 }
 
-func (m *S2SSystem_LoginResult) Reset()         { *m = S2SSystem_LoginResult{} }
-func (m *S2SSystem_LoginResult) String() string { return proto.CompactTextString(m) }
-func (*S2SSystem_LoginResult) ProtoMessage()    {}
+func (m *Account_LoginResult) Reset()         { *m = Account_LoginResult{} }
+func (m *Account_LoginResult) String() string { return proto.CompactTextString(m) }
+func (*Account_LoginResult) ProtoMessage()    {}
 
-func (m *S2SSystem_LoginResult) GetPid() int32 {
+func (m *Account_LoginResult) GetPid() int32 {
 	if m != nil && m.Pid != nil {
 		return *m.Pid
 	}
 	return 0
 }
 
-func (m *S2SSystem_LoginResult) GetResult() int32 {
+func (m *Account_LoginResult) GetResult() int32 {
 	if m != nil && m.Result != nil {
 		return *m.Result
 	}
 	return 0
 }
 
-func (m *S2SSystem_LoginResult) GetBalanceserver() string {
-	if m != nil && m.Balanceserver != nil {
-		return *m.Balanceserver
+func (m *Account_LoginResult) GetGameserver() string {
+	if m != nil && m.Gameserver != nil {
+		return *m.Gameserver
 	}
 	return ""
 }
 
-func (m *S2SSystem_LoginResult) GetPlayerId() int32 {
+func (m *Account_LoginResult) GetPlayerId() int32 {
 	if m != nil && m.PlayerId != nil {
 		return *m.PlayerId
 	}
 	return 0
 }
 
-type S2SSystem_RegisterResult struct {
+type Account_RegisterResult struct {
 	Pid              *int32 `protobuf:"varint,1,opt,name=pid" json:"pid,omitempty"`
 	Result           *int32 `protobuf:"varint,2,opt,name=result" json:"result,omitempty"`
 	XXX_unrecognized []byte `json:"-"`
 }
 
-func (m *S2SSystem_RegisterResult) Reset()         { *m = S2SSystem_RegisterResult{} }
-func (m *S2SSystem_RegisterResult) String() string { return proto.CompactTextString(m) }
-func (*S2SSystem_RegisterResult) ProtoMessage()    {}
+func (m *Account_RegisterResult) Reset()         { *m = Account_RegisterResult{} }
+func (m *Account_RegisterResult) String() string { return proto.CompactTextString(m) }
+func (*Account_RegisterResult) ProtoMessage()    {}
 
-func (m *S2SSystem_RegisterResult) GetPid() int32 {
+func (m *Account_RegisterResult) GetPid() int32 {
 	if m != nil && m.Pid != nil {
 		return *m.Pid
 	}
 	return 0
 }
 
-func (m *S2SSystem_RegisterResult) GetResult() int32 {
+func (m *Account_RegisterResult) GetResult() int32 {
 	if m != nil && m.Result != nil {
 		return *m.Result
+	}
+	return 0
+}
+
+type Account_GetGameAccount struct {
+	Pid              *int32 `protobuf:"varint,1,opt,name=pid" json:"pid,omitempty"`
+	XXX_unrecognized []byte `json:"-"`
+}
+
+func (m *Account_GetGameAccount) Reset()         { *m = Account_GetGameAccount{} }
+func (m *Account_GetGameAccount) String() string { return proto.CompactTextString(m) }
+func (*Account_GetGameAccount) ProtoMessage()    {}
+
+func (m *Account_GetGameAccount) GetPid() int32 {
+	if m != nil && m.Pid != nil {
+		return *m.Pid
+	}
+	return 0
+}
+
+type Account_GameResult struct {
+	Pid              *int32  `protobuf:"varint,1,opt,name=pid" json:"pid,omitempty"`
+	Count            *int32  `protobuf:"varint,2,opt,name=count" json:"count,omitempty"`
+	GameAddress      *string `protobuf:"bytes,3,opt,name=game_address" json:"game_address,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
+}
+
+func (m *Account_GameResult) Reset()         { *m = Account_GameResult{} }
+func (m *Account_GameResult) String() string { return proto.CompactTextString(m) }
+func (*Account_GameResult) ProtoMessage()    {}
+
+func (m *Account_GameResult) GetPid() int32 {
+	if m != nil && m.Pid != nil {
+		return *m.Pid
+	}
+	return 0
+}
+
+func (m *Account_GameResult) GetCount() int32 {
+	if m != nil && m.Count != nil {
+		return *m.Count
+	}
+	return 0
+}
+
+func (m *Account_GameResult) GetGameAddress() string {
+	if m != nil && m.GameAddress != nil {
+		return *m.GameAddress
+	}
+	return ""
+}
+
+type Game struct {
+	XXX_unrecognized []byte `json:"-"`
+}
+
+func (m *Game) Reset()         { *m = Game{} }
+func (m *Game) String() string { return proto.CompactTextString(m) }
+func (*Game) ProtoMessage()    {}
+
+type Game_GetType struct {
+	Pid              *int32 `protobuf:"varint,1,opt,name=pid" json:"pid,omitempty"`
+	XXX_unrecognized []byte `json:"-"`
+}
+
+func (m *Game_GetType) Reset()         { *m = Game_GetType{} }
+func (m *Game_GetType) String() string { return proto.CompactTextString(m) }
+func (*Game_GetType) ProtoMessage()    {}
+
+func (m *Game_GetType) GetPid() int32 {
+	if m != nil && m.Pid != nil {
+		return *m.Pid
 	}
 	return 0
 }

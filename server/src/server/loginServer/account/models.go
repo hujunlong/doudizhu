@@ -1,13 +1,11 @@
 package account
 
-import ()
-
 type LoginBase struct {
 	PlayerId   int32  `orm:"pk"`
 	PlayerName string `orm:"size(64)"`
 	PlayerPwd  string `orm:"size(64)"`
 	Gold       int32
-	ServerId   int32
+	ServerID   string
 	IsForBid   bool
 }
 
