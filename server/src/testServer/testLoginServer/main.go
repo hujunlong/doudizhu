@@ -16,14 +16,14 @@ import (
 
 var log *logs.BeeLogger
 
-const max_client = 100000
+const max_client = 10000
 
 var end = make(chan int)
 
 func init() {
 	log = logs.NewLogger(100000) //日志
 	log.EnableFuncCallDepth(true)
-	log.SetLogger("file", `{"filename":"testLoginServer.log"}`)
+	log.SetLogger("file", `{"filename":"log/testLoginServer.log"}`)
 }
 
 func CheckError(err error) bool {
@@ -77,14 +77,13 @@ func ReciveResult(conn net.Conn, i int, recive_result chan int) {
 			CheckError(err)
 		}
 
-		fmt.Println("*typeStruct.Pid=", *typeStruct.Pid)
 		switch *typeStruct.Pid {
 		case global.LoginResultId:
 			result := new(protocol.Account_LoginResult)
 			if err := proto.Unmarshal(buf[0:n], result); err == nil {
 				switch result.GetResult() {
 				case global.LOGINSUCCESS:
-					log.Info("login sucessfull and player id = %d", result.GetPlayerId())
+					log.Info("login sucessfull and player id=%d gameserver = %s", result.GetPlayerId(), result.GetGameserver())
 				default:
 					log.Error("login error")
 				}
@@ -133,13 +132,12 @@ func main() {
 	var err error
 	for i := 0; i < max_client; i++ {
 
-		arrayConnStruct[i].conn, err = net.Dial("tcp", "127.0.0.1:8081")
+		arrayConnStruct[i].conn, err = net.Dial("tcp", "127.0.0.1:8080")
 		if err != nil {
 			log.Error("connect error %s", err)
 			return
 		}
 		go MessageRun(arrayConnStruct[i].conn, i)
-
 		time.Sleep(5 * time.Millisecond)
 
 	}

@@ -31,14 +31,14 @@ func init() {
 func setLog() {
 	Log = logs.NewLogger(account_log_max) //日志
 	Log.EnableFuncCallDepth(true)
-	err := Log.SetLogger("file", `{"filename":"./account.log"}`)
+	err := Log.SetLogger("file", `{"filename":"log/account.log"}`)
 	if err != nil {
 		fmt.Println(err)
 	}
 }
 
 func readConfig() {
-	err := il8n.GetInit("./account_cfg.ini")
+	err := il8n.GetInit("config/account_cfg.ini")
 	if err == nil {
 		account_log_max, _ = strconv.ParseInt(il8n.Data["account_log_max"].(string), 10, 64)
 		Listen4CAddress = il8n.Data["login_listen_4c_ip"].(string)
@@ -53,10 +53,13 @@ func OpenNewServerConfig() {
 	NewServerAddress = make(map[string]string)
 
 	for k, v := range il8n.Data {
-		if strings.Contains(k.(string), "new_server_") {
-			NewServerAddress[v.(string)] = v.(string)
+		if strings.Contains(k.(string), "new_") {
+			key := strings.TrimLeft(k.(string), "new_")
+			NewServerAddress[key] = v.(string)
 		}
-
+	}
+	if len(NewServerAddress) == 0 {
+		Log.Error("new player can't connect,config can't find new server id")
 	}
 }
 
@@ -87,13 +90,13 @@ func getMaxId() int32 {
 	return int32(count)
 }
 
-func Register(name string, pwd string) int32 {
+func Register(name string, pwd string, server_id string) int32 {
 	//先检查是否username相同
 	user := LoginBase{PlayerName: name}
 	err := o.Read(&user, "PlayerName")
 	if err != nil { //没有被注册
 		count += 1
-		user = LoginBase{PlayerId: count, PlayerName: name, PlayerPwd: pwd, Gold: 0, IsForBid: false}
+		user = LoginBase{PlayerId: count, PlayerName: name, PlayerPwd: pwd, Gold: 0, ServerId: server_id, IsForBid: false}
 		_, err = o.Insert(&user)
 		if err == nil {
 			return global.REGISTERSUCCESS
@@ -103,21 +106,26 @@ func Register(name string, pwd string) int32 {
 	return global.SAMENICK
 }
 
-func VerifyLogin(name string, pwd string) (result int32, player_id int32) {
+func VerifyLogin(name string, pwd string) (result int32, player_id int32, game_address string) {
 	user := LoginBase{PlayerName: name, PlayerPwd: pwd}
 	err := o.Read(&user, "PlayerName", "PlayerPwd")
 
 	if err != nil {
 		Log.Trace("name = %s pwd = %s login error", name, pwd)
-		return global.LOGINERROR, 0
+		return global.LOGINERROR, 0, ""
 	}
 
 	for_bid := ForBid{UserId: user.PlayerId}
 	err = o.Read(&for_bid, "UserId")
 	if err == orm.ErrNoRows {
-		return global.LOGINSUCCESS, user.PlayerId
+
+		if v, ok := il8n.Data[user.ServerId]; ok {
+			return global.LOGINSUCCESS, user.PlayerId, v.(string)
+		} else {
+			Log.Error("user.ServerId not find config for serverList error")
+		}
 	}
 
 	Log.Trace("name = %s pwd = %s login forbid", name, pwd)
-	return global.FORBIDLOGIN, 0
+	return global.FORBIDLOGIN, 0, ""
 }

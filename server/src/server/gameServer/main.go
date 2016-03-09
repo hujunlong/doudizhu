@@ -21,7 +21,16 @@ func init() {
 }
 
 func send2AccountMenber() {
-	//conn2a.Write()
+	server_count += 1
+	result2A := &protocol.Account_GameResult{
+		Pid:         proto.Int32(global.GameResultId),
+		Count:       proto.Int32(server_count),
+		GameAddress: proto.String(game.ServerNoteAddress),
+	}
+
+	encObj, _ := proto.Marshal(result2A)
+	conn2a.Write(encObj)
+	game.Log.Info("send 2 Account message")
 }
 
 func CheckError(err error) bool {
@@ -76,6 +85,7 @@ func main() {
 	conn2a, err2 = net.Dial("tcp", game.Server2AccountAddress)
 	if CheckError(err2) {
 		//定时告诉账号服务器当前人数
+		send2AccountMenber()
 		timer.CreateTimer(game.DistanceTime, true, send2AccountMenber)
 	}
 

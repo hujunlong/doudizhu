@@ -5,7 +5,7 @@ type LoginBase struct {
 	PlayerName string `orm:"size(64)"`
 	PlayerPwd  string `orm:"size(64)"`
 	Gold       int32
-	ServerID   string
+	ServerId   string
 	IsForBid   bool
 }
 

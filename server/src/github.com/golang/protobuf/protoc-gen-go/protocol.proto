@@ -42,7 +42,6 @@ message Account {
 }
 
 message Game {
-
 	message GetType{
 		optional int32 pid = 1;
 	}
