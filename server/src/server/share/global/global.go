@@ -17,13 +17,3 @@ const (
 	LOGINSUCCESS    = 5 //登陆成功
 	FORBIDLOGIN     = 6 //禁止登陆
 )
-
-const (
-	GetTypeId        = 0
-	LoginInfoId      = 1
-	RegisterInfoId   = 2
-	LoginResultId    = 3
-	RegisterResultId = 4
-	GetGameAccountId = 5
-	GameResultId     = 6
-)

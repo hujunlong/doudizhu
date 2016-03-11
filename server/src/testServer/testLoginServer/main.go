@@ -16,7 +16,7 @@ import (
 
 var log *logs.BeeLogger
 
-const max_client = 10000
+const max_client = 1
 
 var end = make(chan int)
 
@@ -37,7 +37,7 @@ func CheckError(err error) bool {
 func SendMsgRegister(conn net.Conn, i int) {
 	nick := strconv.Itoa(i)
 	register := &protocol.Account_RegisterPlayer{
-		Pid:        proto.Int32(global.RegisterInfoId),
+
 		Playername: proto.String(nick),
 		Passworld:  proto.String(nick),
 	}
@@ -53,7 +53,6 @@ func SenMsgLogin(conn net.Conn, i int) {
 	nick := strconv.Itoa(i)
 	//登陆相关
 	loginInfo := &protocol.Account_LoginInfo{
-		Pid:        proto.Int32(global.LoginInfoId),
 		Playername: proto.String(nick),
 		Passworld:  proto.String(nick),
 	}
@@ -78,7 +77,7 @@ func ReciveResult(conn net.Conn, i int, recive_result chan int) {
 		}
 
 		switch *typeStruct.Pid {
-		case global.LoginResultId:
+		case protocol.AccountMsgID_Msg_LoginResult:
 			result := new(protocol.Account_LoginResult)
 			if err := proto.Unmarshal(buf[0:n], result); err == nil {
 				switch result.GetResult() {
@@ -96,7 +95,7 @@ func ReciveResult(conn net.Conn, i int, recive_result chan int) {
 				}
 				return
 			}
-		case global.RegisterResultId:
+		case protocol.AccountMsgID_Msg_RegisterResult:
 			result := new(protocol.Account_RegisterResult)
 			if err := proto.Unmarshal(buf[0:n], result); err == nil {
 				switch result.GetResult() {
@@ -130,15 +129,17 @@ func main() {
 
 	var arrayConnStruct [max_client]ConnStruct
 	var err error
-	for i := 0; i < max_client; i++ {
+	for i := 0; i < max_client; {
 
 		arrayConnStruct[i].conn, err = net.Dial("tcp", "127.0.0.1:8080")
 		if err != nil {
 			log.Error("connect error %s", err)
-			return
+			time.Sleep(100 * time.Millisecond)
+		} else {
+			go MessageRun(arrayConnStruct[i].conn, i)
+			time.Sleep(5 * time.Millisecond)
+			i++
 		}
-		go MessageRun(arrayConnStruct[i].conn, i)
-		time.Sleep(5 * time.Millisecond)
 
 	}
 

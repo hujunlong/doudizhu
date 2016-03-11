@@ -4,7 +4,6 @@ import (
 	"github.com/game_engine/timer"
 	"github.com/golang/protobuf/proto"
 	"server/gameServer/game"
-	"server/share/global"
 	"server/share/protocol"
 )
 
@@ -23,11 +22,11 @@ func init() {
 func send2AccountMenber() {
 	server_count += 1
 	result2A := &protocol.Account_GameResult{
-		Pid:         proto.Int32(global.GameResultId),
 		Count:       proto.Int32(server_count),
 		GameAddress: proto.String(game.ServerNoteAddress),
 	}
-
+	result2A.Pid = &protocol.Default_Account_GameResult_Pid
+	fmt.Println(result2A)
 	encObj, _ := proto.Marshal(result2A)
 	conn2a.Write(encObj)
 	game.Log.Info("send 2 Account message")
@@ -64,9 +63,11 @@ func Handler4C(conn net.Conn) {
 		}
 
 		switch *typeStruct.Pid {
-		case global.LoginInfoId:
+		case protocol.GameMsgID_Game_Msg_Login:
 			//登陆
-
+			login := new(protocol.Account_LoginInfo)
+			if err := proto.Unmarshal(buf[0:n], login); err == nil {
+			}
 		default:
 		}
 	}

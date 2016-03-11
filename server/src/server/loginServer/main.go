@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/golang/protobuf/proto"
 	"server/loginServer/account"
-	"server/share/global"
 	"server/share/protocol"
 )
 
@@ -11,13 +10,16 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"sync"
 )
 
 var gameConnects map[string]account.Connect4C
 var end = make(chan int)
+var accountMutex *sync.RWMutex
 
 func init() {
 	gameConnects = make(map[string]account.Connect4C)
+	accountMutex = new(sync.RWMutex)
 }
 
 func CheckError(err error) bool {
@@ -29,6 +31,9 @@ func CheckError(err error) bool {
 }
 
 func getNewAddress() (key string, value string, err error) {
+	accountMutex.Lock()
+	defer accountMutex.Unlock()
+
 	var address string = ""
 	var max_count int32 = 99999
 	var address_id string = ""
@@ -71,14 +76,13 @@ func Handler4C(conn net.Conn) {
 		}
 
 		switch *typeStruct.Pid {
-		case global.LoginInfoId:
+		case protocol.AccountMsgID_Msg_LoginInfo:
 			//登陆
 			login := new(protocol.Account_LoginInfo)
 			if err := proto.Unmarshal(buf[0:n], login); err == nil {
 				result, player_id, server_id := account.VerifyLogin(login.GetPlayername(), login.GetPassworld())
 				//发送登陆并断开连接
 				result4C := &protocol.Account_LoginResult{
-					Pid:        proto.Int32(global.LoginResultId),
 					Result:     proto.Int32(result),
 					PlayerId:   proto.Int32(player_id),
 					Gameserver: proto.String(server_id),
@@ -89,7 +93,7 @@ func Handler4C(conn net.Conn) {
 				conn.Close()
 				account.Log.Info("send login message")
 			}
-		case global.RegisterInfoId:
+		case protocol.AccountMsgID_Msg_RegisterPlayer:
 			//注册
 			register := new(protocol.Account_RegisterPlayer)
 			if err := proto.Unmarshal(buf[0:n], register); err == nil {
@@ -97,7 +101,6 @@ func Handler4C(conn net.Conn) {
 				result := account.Register(register.GetPlayername(), register.GetPassworld(), game_id)
 
 				result4C := &protocol.Account_RegisterResult{
-					Pid:    proto.Int32(global.RegisterResultId),
 					Result: proto.Int32(result),
 				}
 
@@ -117,6 +120,7 @@ func Handler4Game(conn net.Conn) {
 	buf := make([]byte, MAXLEN)
 	for {
 		n, err := conn.Read(buf) //接收具体消息
+		fmt.Println("buff = ", buf)
 		if err != nil {
 			return
 		}
@@ -133,14 +137,17 @@ func Handler4Game(conn net.Conn) {
 			continue
 		}
 
+		fmt.Println("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh")
+		get_account := new(protocol.Account_GameResult)
+		proto.Unmarshal(buf[0:n], get_account)
+		fmt.Println(get_account)
 		switch *typeStruct.Pid {
-		case global.GameResultId:
+		case protocol.AccountMsgID_Msg_GameResult:
 			//读取各个服务器发送过来的在线人数
 			get_account := new(protocol.Account_GameResult)
 			if err := proto.Unmarshal(buf[0:n], get_account); err == nil {
 				key := get_account.GetGameAddress()
 				gameConnects[key] = account.Connect4C{get_account.GetGameAddress(), get_account.GetCount()}
-				fmt.Println(get_account.GetGameAddress(), get_account.GetCount())
 				account.Log.Info("get account message")
 			}
 

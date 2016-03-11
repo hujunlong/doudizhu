@@ -9,8 +9,10 @@ import (
 	"server/share/global"
 	"strconv"
 	"strings"
+	"sync"
 )
 
+var accountMutex *sync.RWMutex
 var o orm.Ormer
 var count int32 //现在最大的playerid
 var Log *logs.BeeLogger
@@ -21,6 +23,7 @@ var mysql_address string
 var NewServerAddress map[string]string
 
 func init() {
+	accountMutex = new(sync.RWMutex)
 	setLog()
 	readConfig()
 	OpenNewServerConfig()
@@ -91,6 +94,9 @@ func getMaxId() int32 {
 }
 
 func Register(name string, pwd string, server_id string) int32 {
+	accountMutex.Lock()
+	defer accountMutex.Unlock()
+
 	//先检查是否username相同
 	user := LoginBase{PlayerName: name}
 	err := o.Read(&user, "PlayerName")
@@ -107,6 +113,9 @@ func Register(name string, pwd string, server_id string) int32 {
 }
 
 func VerifyLogin(name string, pwd string) (result int32, player_id int32, game_address string) {
+	accountMutex.Lock()
+	defer accountMutex.Unlock()
+
 	user := LoginBase{PlayerName: name, PlayerPwd: pwd}
 	err := o.Read(&user, "PlayerName", "PlayerPwd")
 
