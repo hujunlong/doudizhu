@@ -1,0 +1,110 @@
+package protocol;
+
+enum AccountMsgID
+{
+	Msg_GetType = 0;
+	Msg_LoginInfo = 1;
+	Msg_RegisterPlayer = 2;
+	Msg_LoginResult = 3;
+	Msg_RegisterResult = 4;
+	Msg_GetGameAccount = 5;
+	Msg_GameResult = 6;
+}
+
+enum GameMsgID
+{
+	Game_Msg_GetType = 1000;
+	Game_Msg_Login = 1001;
+	Game_Msg_LoginResult = 1002;
+	Game_Msg_RegisterRole = 1003;
+	Game_Msg_RegisterRoleResult = 1004;
+	Game_Msg_GetRoleInfo = 1005;
+	Game_Msg_RoleInfoResult = 1006;
+}
+
+message Account {
+	
+	message GetType{
+		optional AccountMsgID pid = 1 ;
+	}
+	
+	message LoginInfo{
+		optional AccountMsgID pid = 1 [default = Msg_LoginInfo];
+		optional string playername = 2;  
+		optional string passworld = 3;
+	}
+
+	message RegisterPlayer {
+		optional AccountMsgID pid = 1 [default = Msg_RegisterPlayer];  
+		optional string playername = 2;
+		optional string passworld = 3;
+	}
+	
+	message LoginResult {
+		optional AccountMsgID pid = 1 [default = Msg_LoginResult];
+		optional int32 result = 2;
+		optional string gameserver = 3;
+		optional int32 player_id = 4;	
+	}
+	
+	message RegisterResult {
+		optional AccountMsgID pid = 1 [default = Msg_RegisterResult];
+		optional int32 result = 2;
+	}
+	
+	message GetGameAccount {
+		optional AccountMsgID pid = 1 [default = Msg_GetGameAccount];
+	}
+	
+	message GameResult {
+		optional AccountMsgID pid = 1 [default = Msg_GameResult];
+		optional int32 count = 2;
+		optional string game_address = 3;
+	}
+}
+
+message Game {
+	message GetType{
+		optional GameMsgID pid = 1 [default = Game_Msg_GetType];
+	}
+	
+	message Login {
+		optional GameMsgID pid = 1 [default = Game_Msg_Login]; 
+	}
+	
+	message LoginResult{
+		optional GameMsgID pid = 1 [default = Game_Msg_LoginResult];
+		optional int32 result = 2;
+	}
+	
+	message BaseRole {
+		required int32 nick = 1;
+		required int32 sex = 2;
+	}
+		
+	message RegisterRole {
+		optional GameMsgID GameMsgID = 1 [default = Game_Msg_RegisterRole];
+		optional BaseRole info = 2;
+	}
+	
+	message RegisterRoleResult{
+		optional GameMsgID pid = 1 [default = Game_Msg_RegisterRoleResult];
+		optional int32 result = 2;
+	}
+	
+	message GetRoleInfo{
+		optional GameMsgID pid = 1 [default = Game_Msg_GetRoleInfo];
+	}
+	
+	message RoleInfo {
+		optional BaseRole base_role = 1;
+		repeated int32 equip_ids = 2;
+		repeated int32 task_ids = 3;
+	}
+	
+	message RoleInfoResult{
+		optional GameMsgID pid = 1 [default = Game_Msg_RoleInfoResult];
+		optional RoleInfo role = 2; 
+	}
+	
+}

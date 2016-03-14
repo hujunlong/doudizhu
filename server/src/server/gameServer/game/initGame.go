@@ -10,9 +10,10 @@ import (
 import (
 	"fmt"
 	"strconv"
+	"sync"
 )
 
-var o orm.Ormer
+var O orm.Ormer
 var Log *logs.BeeLogger
 var account_log_max int64
 var mysql_address string
@@ -20,12 +21,14 @@ var ServerAddress string
 var Server2AccountAddress string
 var ServerNoteAddress string
 var DistanceTime int
+var gameMutex *sync.RWMutex
+var game_id int32 = 0
 
 func init() {
+	gameMutex = new(sync.RWMutex)
 	setLog()
 	readConfig()
 	dbConfig()
-
 }
 
 func setLog() {
@@ -40,6 +43,7 @@ func setLog() {
 func readConfig() {
 	err := il8n.GetInit("config/game_cfg.ini")
 	if err == nil {
+		game_id = il8n.Data["game_id"].(int32)
 		account_log_max, _ = strconv.ParseInt(il8n.Data["account_log_max"].(string), 10, 64)
 		ServerAddress = il8n.Data["server_address"].(string)
 		Server2AccountAddress = il8n.Data["server_2_accont_address"].(string)
@@ -63,5 +67,8 @@ func dbConfig() {
 
 	// create table
 	orm.RunSyncdb("default", false, true)
-	o = orm.NewOrm()
+	O = orm.NewOrm()
+
+	fmt.Println("come here now2222")
+	NoteGame(1)
 }

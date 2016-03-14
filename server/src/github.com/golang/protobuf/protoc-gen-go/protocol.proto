@@ -2,24 +2,26 @@ package protocol;
 
 enum AccountMsgID
 {
+	//客户端与账号服务器之间的数据
 	Msg_GetType = 0;
-	Msg_LoginInfo = 1;
-	Msg_RegisterPlayer = 2;
-	Msg_LoginResult = 3;
-	Msg_RegisterResult = 4;
-	Msg_GetGameAccount = 5;
-	Msg_GameResult = 6;
+	Msg_RegisterPlayer = 1;
+	Msg_RegisterResult = 2;
+	Msg_LoginInfo = 3;
+	Msg_LoginResult = 4;
+	
+	//账号服务器与游戏服务器之间的通信
+	Msg_GetGameAccount = 100;
+	Msg_GameResult = 101;
+	Msg_NoteGame = 102;//通知游戏服务器玩家注册成功
 }
 
 enum GameMsgID
 {
 	Game_Msg_GetType = 1000;
-	Game_Msg_Login = 1001;
-	Game_Msg_LoginResult = 1002;
-	Game_Msg_RegisterRole = 1003;
-	Game_Msg_RegisterRoleResult = 1004;
-	Game_Msg_GetRoleInfo = 1005;
-	Game_Msg_RoleInfoResult = 1006;
+	Game_Msg_RegisterRole = 1001;
+	Game_Msg_RegisterRoleResult = 1002;
+	Game_Msg_GetRoleInfo = 1003;
+	Game_Msg_RoleInfoResult = 1004;
 }
 
 message Account {
@@ -28,18 +30,13 @@ message Account {
 		optional AccountMsgID pid = 1 ;
 	}
 	
+	//客户端消息
 	message LoginInfo{
 		optional AccountMsgID pid = 1 [default = Msg_LoginInfo];
 		optional string playername = 2;  
 		optional string passworld = 3;
 	}
 
-	message RegisterPlayer {
-		optional AccountMsgID pid = 1 [default = Msg_RegisterPlayer];  
-		optional string playername = 2;
-		optional string passworld = 3;
-	}
-	
 	message LoginResult {
 		optional AccountMsgID pid = 1 [default = Msg_LoginResult];
 		optional int32 result = 2;
@@ -47,11 +44,19 @@ message Account {
 		optional int32 player_id = 4;	
 	}
 	
+	message RegisterPlayer {
+		optional AccountMsgID pid = 1 [default = Msg_RegisterPlayer];  
+		optional string playername = 2;
+		optional string passworld = 3;
+	}
+	
+	
 	message RegisterResult {
 		optional AccountMsgID pid = 1 [default = Msg_RegisterResult];
 		optional int32 result = 2;
 	}
 	
+	//发送给game消息
 	message GetGameAccount {
 		optional AccountMsgID pid = 1 [default = Msg_GetGameAccount];
 	}
@@ -61,20 +66,16 @@ message Account {
 		optional int32 count = 2;
 		optional string game_address = 3;
 	}
+	
+	message NoteGame {
+		optional AccountMsgID pid = 1 [default = Msg_NoteGame];
+		optional int32 player_id = 2;
+	}
 }
 
 message Game {
 	message GetType{
 		optional GameMsgID pid = 1 [default = Game_Msg_GetType];
-	}
-	
-	message Login {
-		optional GameMsgID pid = 1 [default = Game_Msg_Login]; 
-	}
-	
-	message LoginResult{
-		optional GameMsgID pid = 1 [default = Game_Msg_LoginResult];
-		optional int32 result = 2;
 	}
 	
 	message BaseRole {

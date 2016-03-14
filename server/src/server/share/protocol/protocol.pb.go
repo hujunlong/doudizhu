@@ -24,32 +24,37 @@ var _ = math.Inf
 type AccountMsgID int32
 
 const (
+	// 客户端与账号服务器之间的数据
 	AccountMsgID_Msg_GetType        AccountMsgID = 0
-	AccountMsgID_Msg_LoginInfo      AccountMsgID = 1
-	AccountMsgID_Msg_RegisterPlayer AccountMsgID = 2
-	AccountMsgID_Msg_LoginResult    AccountMsgID = 3
-	AccountMsgID_Msg_RegisterResult AccountMsgID = 4
-	AccountMsgID_Msg_GetGameAccount AccountMsgID = 5
-	AccountMsgID_Msg_GameResult     AccountMsgID = 6
+	AccountMsgID_Msg_RegisterPlayer AccountMsgID = 1
+	AccountMsgID_Msg_RegisterResult AccountMsgID = 2
+	AccountMsgID_Msg_LoginInfo      AccountMsgID = 3
+	AccountMsgID_Msg_LoginResult    AccountMsgID = 4
+	// 账号服务器与游戏服务器之间的通信
+	AccountMsgID_Msg_GetGameAccount AccountMsgID = 100
+	AccountMsgID_Msg_GameResult     AccountMsgID = 101
+	AccountMsgID_Msg_NoteGame       AccountMsgID = 102
 )
 
 var AccountMsgID_name = map[int32]string{
-	0: "Msg_GetType",
-	1: "Msg_LoginInfo",
-	2: "Msg_RegisterPlayer",
-	3: "Msg_LoginResult",
-	4: "Msg_RegisterResult",
-	5: "Msg_GetGameAccount",
-	6: "Msg_GameResult",
+	0:   "Msg_GetType",
+	1:   "Msg_RegisterPlayer",
+	2:   "Msg_RegisterResult",
+	3:   "Msg_LoginInfo",
+	4:   "Msg_LoginResult",
+	100: "Msg_GetGameAccount",
+	101: "Msg_GameResult",
+	102: "Msg_NoteGame",
 }
 var AccountMsgID_value = map[string]int32{
 	"Msg_GetType":        0,
-	"Msg_LoginInfo":      1,
-	"Msg_RegisterPlayer": 2,
-	"Msg_LoginResult":    3,
-	"Msg_RegisterResult": 4,
-	"Msg_GetGameAccount": 5,
-	"Msg_GameResult":     6,
+	"Msg_RegisterPlayer": 1,
+	"Msg_RegisterResult": 2,
+	"Msg_LoginInfo":      3,
+	"Msg_LoginResult":    4,
+	"Msg_GetGameAccount": 100,
+	"Msg_GameResult":     101,
+	"Msg_NoteGame":       102,
 }
 
 func (x AccountMsgID) Enum() *AccountMsgID {
@@ -73,31 +78,25 @@ type GameMsgID int32
 
 const (
 	GameMsgID_Game_Msg_GetType            GameMsgID = 1000
-	GameMsgID_Game_Msg_Login              GameMsgID = 1001
-	GameMsgID_Game_Msg_LoginResult        GameMsgID = 1002
-	GameMsgID_Game_Msg_RegisterRole       GameMsgID = 1003
-	GameMsgID_Game_Msg_RegisterRoleResult GameMsgID = 1004
-	GameMsgID_Game_Msg_GetRoleInfo        GameMsgID = 1005
-	GameMsgID_Game_Msg_RoleInfoResult     GameMsgID = 1006
+	GameMsgID_Game_Msg_RegisterRole       GameMsgID = 1001
+	GameMsgID_Game_Msg_RegisterRoleResult GameMsgID = 1002
+	GameMsgID_Game_Msg_GetRoleInfo        GameMsgID = 1003
+	GameMsgID_Game_Msg_RoleInfoResult     GameMsgID = 1004
 )
 
 var GameMsgID_name = map[int32]string{
 	1000: "Game_Msg_GetType",
-	1001: "Game_Msg_Login",
-	1002: "Game_Msg_LoginResult",
-	1003: "Game_Msg_RegisterRole",
-	1004: "Game_Msg_RegisterRoleResult",
-	1005: "Game_Msg_GetRoleInfo",
-	1006: "Game_Msg_RoleInfoResult",
+	1001: "Game_Msg_RegisterRole",
+	1002: "Game_Msg_RegisterRoleResult",
+	1003: "Game_Msg_GetRoleInfo",
+	1004: "Game_Msg_RoleInfoResult",
 }
 var GameMsgID_value = map[string]int32{
 	"Game_Msg_GetType":            1000,
-	"Game_Msg_Login":              1001,
-	"Game_Msg_LoginResult":        1002,
-	"Game_Msg_RegisterRole":       1003,
-	"Game_Msg_RegisterRoleResult": 1004,
-	"Game_Msg_GetRoleInfo":        1005,
-	"Game_Msg_RoleInfoResult":     1006,
+	"Game_Msg_RegisterRole":       1001,
+	"Game_Msg_RegisterRoleResult": 1002,
+	"Game_Msg_GetRoleInfo":        1003,
+	"Game_Msg_RoleInfoResult":     1004,
 }
 
 func (x GameMsgID) Enum() *GameMsgID {
@@ -141,8 +140,9 @@ func (m *Account_GetType) GetPid() AccountMsgID {
 	return AccountMsgID_Msg_GetType
 }
 
+// 客户端消息
 type Account_LoginInfo struct {
-	Pid              *AccountMsgID `protobuf:"varint,1,opt,name=pid,enum=protocol.AccountMsgID,def=1" json:"pid,omitempty"`
+	Pid              *AccountMsgID `protobuf:"varint,1,opt,name=pid,enum=protocol.AccountMsgID,def=3" json:"pid,omitempty"`
 	Playername       *string       `protobuf:"bytes,2,opt,name=playername" json:"playername,omitempty"`
 	Passworld        *string       `protobuf:"bytes,3,opt,name=passworld" json:"passworld,omitempty"`
 	XXX_unrecognized []byte        `json:"-"`
@@ -175,42 +175,8 @@ func (m *Account_LoginInfo) GetPassworld() string {
 	return ""
 }
 
-type Account_RegisterPlayer struct {
-	Pid              *AccountMsgID `protobuf:"varint,1,opt,name=pid,enum=protocol.AccountMsgID,def=2" json:"pid,omitempty"`
-	Playername       *string       `protobuf:"bytes,2,opt,name=playername" json:"playername,omitempty"`
-	Passworld        *string       `protobuf:"bytes,3,opt,name=passworld" json:"passworld,omitempty"`
-	XXX_unrecognized []byte        `json:"-"`
-}
-
-func (m *Account_RegisterPlayer) Reset()         { *m = Account_RegisterPlayer{} }
-func (m *Account_RegisterPlayer) String() string { return proto.CompactTextString(m) }
-func (*Account_RegisterPlayer) ProtoMessage()    {}
-
-const Default_Account_RegisterPlayer_Pid AccountMsgID = AccountMsgID_Msg_RegisterPlayer
-
-func (m *Account_RegisterPlayer) GetPid() AccountMsgID {
-	if m != nil && m.Pid != nil {
-		return *m.Pid
-	}
-	return Default_Account_RegisterPlayer_Pid
-}
-
-func (m *Account_RegisterPlayer) GetPlayername() string {
-	if m != nil && m.Playername != nil {
-		return *m.Playername
-	}
-	return ""
-}
-
-func (m *Account_RegisterPlayer) GetPassworld() string {
-	if m != nil && m.Passworld != nil {
-		return *m.Passworld
-	}
-	return ""
-}
-
 type Account_LoginResult struct {
-	Pid              *AccountMsgID `protobuf:"varint,1,opt,name=pid,enum=protocol.AccountMsgID,def=3" json:"pid,omitempty"`
+	Pid              *AccountMsgID `protobuf:"varint,1,opt,name=pid,enum=protocol.AccountMsgID,def=4" json:"pid,omitempty"`
 	Result           *int32        `protobuf:"varint,2,opt,name=result" json:"result,omitempty"`
 	Gameserver       *string       `protobuf:"bytes,3,opt,name=gameserver" json:"gameserver,omitempty"`
 	PlayerId         *int32        `protobuf:"varint,4,opt,name=player_id" json:"player_id,omitempty"`
@@ -251,8 +217,42 @@ func (m *Account_LoginResult) GetPlayerId() int32 {
 	return 0
 }
 
+type Account_RegisterPlayer struct {
+	Pid              *AccountMsgID `protobuf:"varint,1,opt,name=pid,enum=protocol.AccountMsgID,def=1" json:"pid,omitempty"`
+	Playername       *string       `protobuf:"bytes,2,opt,name=playername" json:"playername,omitempty"`
+	Passworld        *string       `protobuf:"bytes,3,opt,name=passworld" json:"passworld,omitempty"`
+	XXX_unrecognized []byte        `json:"-"`
+}
+
+func (m *Account_RegisterPlayer) Reset()         { *m = Account_RegisterPlayer{} }
+func (m *Account_RegisterPlayer) String() string { return proto.CompactTextString(m) }
+func (*Account_RegisterPlayer) ProtoMessage()    {}
+
+const Default_Account_RegisterPlayer_Pid AccountMsgID = AccountMsgID_Msg_RegisterPlayer
+
+func (m *Account_RegisterPlayer) GetPid() AccountMsgID {
+	if m != nil && m.Pid != nil {
+		return *m.Pid
+	}
+	return Default_Account_RegisterPlayer_Pid
+}
+
+func (m *Account_RegisterPlayer) GetPlayername() string {
+	if m != nil && m.Playername != nil {
+		return *m.Playername
+	}
+	return ""
+}
+
+func (m *Account_RegisterPlayer) GetPassworld() string {
+	if m != nil && m.Passworld != nil {
+		return *m.Passworld
+	}
+	return ""
+}
+
 type Account_RegisterResult struct {
-	Pid              *AccountMsgID `protobuf:"varint,1,opt,name=pid,enum=protocol.AccountMsgID,def=4" json:"pid,omitempty"`
+	Pid              *AccountMsgID `protobuf:"varint,1,opt,name=pid,enum=protocol.AccountMsgID,def=2" json:"pid,omitempty"`
 	Result           *int32        `protobuf:"varint,2,opt,name=result" json:"result,omitempty"`
 	XXX_unrecognized []byte        `json:"-"`
 }
@@ -277,8 +277,9 @@ func (m *Account_RegisterResult) GetResult() int32 {
 	return 0
 }
 
+// 发送给game消息
 type Account_GetGameAccount struct {
-	Pid              *AccountMsgID `protobuf:"varint,1,opt,name=pid,enum=protocol.AccountMsgID,def=5" json:"pid,omitempty"`
+	Pid              *AccountMsgID `protobuf:"varint,1,opt,name=pid,enum=protocol.AccountMsgID,def=100" json:"pid,omitempty"`
 	XXX_unrecognized []byte        `json:"-"`
 }
 
@@ -296,7 +297,7 @@ func (m *Account_GetGameAccount) GetPid() AccountMsgID {
 }
 
 type Account_GameResult struct {
-	Pid              *AccountMsgID `protobuf:"varint,1,opt,name=pid,enum=protocol.AccountMsgID,def=6" json:"pid,omitempty"`
+	Pid              *AccountMsgID `protobuf:"varint,1,opt,name=pid,enum=protocol.AccountMsgID,def=101" json:"pid,omitempty"`
 	Count            *int32        `protobuf:"varint,2,opt,name=count" json:"count,omitempty"`
 	GameAddress      *string       `protobuf:"bytes,3,opt,name=game_address" json:"game_address,omitempty"`
 	XXX_unrecognized []byte        `json:"-"`
@@ -329,6 +330,32 @@ func (m *Account_GameResult) GetGameAddress() string {
 	return ""
 }
 
+type Account_NoteGame struct {
+	Pid              *AccountMsgID `protobuf:"varint,1,opt,name=pid,enum=protocol.AccountMsgID,def=102" json:"pid,omitempty"`
+	PlayerId         *int32        `protobuf:"varint,2,opt,name=player_id" json:"player_id,omitempty"`
+	XXX_unrecognized []byte        `json:"-"`
+}
+
+func (m *Account_NoteGame) Reset()         { *m = Account_NoteGame{} }
+func (m *Account_NoteGame) String() string { return proto.CompactTextString(m) }
+func (*Account_NoteGame) ProtoMessage()    {}
+
+const Default_Account_NoteGame_Pid AccountMsgID = AccountMsgID_Msg_NoteGame
+
+func (m *Account_NoteGame) GetPid() AccountMsgID {
+	if m != nil && m.Pid != nil {
+		return *m.Pid
+	}
+	return Default_Account_NoteGame_Pid
+}
+
+func (m *Account_NoteGame) GetPlayerId() int32 {
+	if m != nil && m.PlayerId != nil {
+		return *m.PlayerId
+	}
+	return 0
+}
+
 type Game struct {
 	XXX_unrecognized []byte `json:"-"`
 }
@@ -353,50 +380,6 @@ func (m *Game_GetType) GetPid() GameMsgID {
 		return *m.Pid
 	}
 	return Default_Game_GetType_Pid
-}
-
-type Game_Login struct {
-	Pid              *GameMsgID `protobuf:"varint,1,opt,name=pid,enum=protocol.GameMsgID,def=1001" json:"pid,omitempty"`
-	XXX_unrecognized []byte     `json:"-"`
-}
-
-func (m *Game_Login) Reset()         { *m = Game_Login{} }
-func (m *Game_Login) String() string { return proto.CompactTextString(m) }
-func (*Game_Login) ProtoMessage()    {}
-
-const Default_Game_Login_Pid GameMsgID = GameMsgID_Game_Msg_Login
-
-func (m *Game_Login) GetPid() GameMsgID {
-	if m != nil && m.Pid != nil {
-		return *m.Pid
-	}
-	return Default_Game_Login_Pid
-}
-
-type Game_LoginResult struct {
-	Pid              *GameMsgID `protobuf:"varint,1,opt,name=pid,enum=protocol.GameMsgID,def=1002" json:"pid,omitempty"`
-	Result           *int32     `protobuf:"varint,2,opt,name=result" json:"result,omitempty"`
-	XXX_unrecognized []byte     `json:"-"`
-}
-
-func (m *Game_LoginResult) Reset()         { *m = Game_LoginResult{} }
-func (m *Game_LoginResult) String() string { return proto.CompactTextString(m) }
-func (*Game_LoginResult) ProtoMessage()    {}
-
-const Default_Game_LoginResult_Pid GameMsgID = GameMsgID_Game_Msg_LoginResult
-
-func (m *Game_LoginResult) GetPid() GameMsgID {
-	if m != nil && m.Pid != nil {
-		return *m.Pid
-	}
-	return Default_Game_LoginResult_Pid
-}
-
-func (m *Game_LoginResult) GetResult() int32 {
-	if m != nil && m.Result != nil {
-		return *m.Result
-	}
-	return 0
 }
 
 type Game_BaseRole struct {
@@ -424,7 +407,7 @@ func (m *Game_BaseRole) GetSex() int32 {
 }
 
 type Game_RegisterRole struct {
-	GameMsgID        *GameMsgID     `protobuf:"varint,1,opt,enum=protocol.GameMsgID,def=1003" json:"GameMsgID,omitempty"`
+	GameMsgID        *GameMsgID     `protobuf:"varint,1,opt,enum=protocol.GameMsgID,def=1001" json:"GameMsgID,omitempty"`
 	Info             *Game_BaseRole `protobuf:"bytes,2,opt,name=info" json:"info,omitempty"`
 	XXX_unrecognized []byte         `json:"-"`
 }
@@ -450,7 +433,7 @@ func (m *Game_RegisterRole) GetInfo() *Game_BaseRole {
 }
 
 type Game_RegisterRoleResult struct {
-	Pid              *GameMsgID `protobuf:"varint,1,opt,name=pid,enum=protocol.GameMsgID,def=1004" json:"pid,omitempty"`
+	Pid              *GameMsgID `protobuf:"varint,1,opt,name=pid,enum=protocol.GameMsgID,def=1002" json:"pid,omitempty"`
 	Result           *int32     `protobuf:"varint,2,opt,name=result" json:"result,omitempty"`
 	XXX_unrecognized []byte     `json:"-"`
 }
@@ -476,7 +459,7 @@ func (m *Game_RegisterRoleResult) GetResult() int32 {
 }
 
 type Game_GetRoleInfo struct {
-	Pid              *GameMsgID `protobuf:"varint,1,opt,name=pid,enum=protocol.GameMsgID,def=1005" json:"pid,omitempty"`
+	Pid              *GameMsgID `protobuf:"varint,1,opt,name=pid,enum=protocol.GameMsgID,def=1003" json:"pid,omitempty"`
 	XXX_unrecognized []byte     `json:"-"`
 }
 
@@ -526,7 +509,7 @@ func (m *Game_RoleInfo) GetTaskIds() []int32 {
 }
 
 type Game_RoleInfoResult struct {
-	Pid              *GameMsgID     `protobuf:"varint,1,opt,name=pid,enum=protocol.GameMsgID,def=1006" json:"pid,omitempty"`
+	Pid              *GameMsgID     `protobuf:"varint,1,opt,name=pid,enum=protocol.GameMsgID,def=1004" json:"pid,omitempty"`
 	Role             *Game_RoleInfo `protobuf:"bytes,2,opt,name=role" json:"role,omitempty"`
 	XXX_unrecognized []byte         `json:"-"`
 }

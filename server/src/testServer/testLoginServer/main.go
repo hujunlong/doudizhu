@@ -16,7 +16,7 @@ import (
 
 var log *logs.BeeLogger
 
-const max_client = 1
+const max_client = 10
 
 var end = make(chan int)
 
@@ -36,8 +36,9 @@ func CheckError(err error) bool {
 
 func SendMsgRegister(conn net.Conn, i int) {
 	nick := strconv.Itoa(i)
+	pid := protocol.AccountMsgID_Msg_RegisterPlayer
 	register := &protocol.Account_RegisterPlayer{
-
+		Pid:        &pid,
 		Playername: proto.String(nick),
 		Passworld:  proto.String(nick),
 	}
@@ -52,7 +53,9 @@ func SendMsgRegister(conn net.Conn, i int) {
 func SenMsgLogin(conn net.Conn, i int) {
 	nick := strconv.Itoa(i)
 	//登陆相关
+	pid := protocol.AccountMsgID_Msg_LoginInfo
 	loginInfo := &protocol.Account_LoginInfo{
+		Pid:        &pid,
 		Playername: proto.String(nick),
 		Passworld:  proto.String(nick),
 	}
@@ -72,7 +75,7 @@ func ReciveResult(conn net.Conn, i int, recive_result chan int) {
 		n, _ := conn.Read(buf) //接收具体消息
 		//接收包的type类型用来区分包之间的区别
 		typeStruct := new(protocol.Account_GetType)
-		if err := proto.Unmarshal(buf[0:n], typeStruct); err != nil {
+		if err := proto.Unmarshal(buf[0:4], typeStruct); err != nil {
 			CheckError(err)
 		}
 

@@ -20,7 +20,7 @@ var account_log_max int64
 var Listen4CAddress string
 var Listen4GameAddress string
 var mysql_address string
-var NewServerAddress map[string]string
+var NewServerAddress map[string]string //such as [1]"127.0.0.1:1234"
 
 func init() {
 	accountMutex = new(sync.RWMutex)
@@ -93,7 +93,7 @@ func getMaxId() int32 {
 	return int32(count)
 }
 
-func Register(name string, pwd string, server_id string) int32 {
+func Register(name string, pwd string, server_id string) (int32, int32) {
 	accountMutex.Lock()
 	defer accountMutex.Unlock()
 
@@ -105,11 +105,11 @@ func Register(name string, pwd string, server_id string) int32 {
 		user = LoginBase{PlayerId: count, PlayerName: name, PlayerPwd: pwd, Gold: 0, ServerId: server_id, IsForBid: false}
 		_, err = o.Insert(&user)
 		if err == nil {
-			return global.REGISTERSUCCESS
+			return global.REGISTERSUCCESS, count
 		}
 	}
 	Log.Trace("name = %s pwd = %s have same SAMENICK", name, pwd)
-	return global.SAMENICK
+	return global.SAMENICK, 0
 }
 
 func VerifyLogin(name string, pwd string) (result int32, player_id int32, game_address string) {

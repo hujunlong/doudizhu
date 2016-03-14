@@ -1,5 +1,9 @@
 package account
 
+import (
+	"net"
+)
+
 type LoginBase struct {
 	PlayerId   int32  `orm:"pk"`
 	PlayerName string `orm:"size(64)"`
@@ -17,4 +21,5 @@ type ForBid struct {
 type Connect4C struct {
 	Address string
 	Count   int32
+	Conn    net.Conn
 }
