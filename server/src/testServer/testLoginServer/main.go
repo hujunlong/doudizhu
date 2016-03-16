@@ -16,7 +16,7 @@ import (
 
 var log *logs.BeeLogger
 
-const max_client = 10
+const max_client = 1
 
 var end = make(chan int)
 

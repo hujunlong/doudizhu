@@ -10,29 +10,30 @@ import (
 import (
 	"fmt"
 	"strconv"
-	"sync"
 )
 
+//全局性
 var O orm.Ormer
 var Log *logs.BeeLogger
-var account_log_max int64
-var mysql_address string
-var ServerAddress string
-var Server2AccountAddress string
-var ServerNoteAddress string
-var DistanceTime int
-var gameMutex *sync.RWMutex
-var game_id int32 = 0
 
-func init() {
-	gameMutex = new(sync.RWMutex)
-	setLog()
-	readConfig()
-	dbConfig()
+type Config struct {
+	account_log_max       int64
+	mysql_address         string
+	ServerAddress         string
+	Server2AccountAddress string
+	ServerNoteAddress     string
+	GameId                int32
+	DistanceTime          int
 }
 
-func setLog() {
-	Log = logs.NewLogger(account_log_max) //日志
+func (this *Config) Init() {
+	this.setLog()
+	this.readConfig()
+	this.dbConfig()
+}
+
+func (this *Config) setLog() {
+	Log = logs.NewLogger(this.account_log_max) //日志
 	Log.EnableFuncCallDepth(true)
 	err := Log.SetLogger("file", `{"filename":"log/game.log"}`)
 	if err != nil {
@@ -40,24 +41,26 @@ func setLog() {
 	}
 }
 
-func readConfig() {
+func (this *Config) readConfig() {
 	err := il8n.GetInit("config/game_cfg.ini")
 	if err == nil {
-		game_id = il8n.Data["game_id"].(int32)
-		account_log_max, _ = strconv.ParseInt(il8n.Data["account_log_max"].(string), 10, 64)
-		ServerAddress = il8n.Data["server_address"].(string)
-		Server2AccountAddress = il8n.Data["server_2_accont_address"].(string)
-		ServerNoteAddress = il8n.Data["server_note_address"].(string)
-		DistanceTime, _ = strconv.Atoi(il8n.Data["distance_time"].(string))
-		mysql_address = il8n.Data["mysql_user"].(string) + ":" + il8n.Data["mysql_pwd"].(string) + "@tcp(" + il8n.Data["mysql_ip"].(string) + ":" + il8n.Data["mysql_port"].(string) + ")/" + il8n.Data["mysql_db"].(string) + "?charset=utf8"
+
+		GameId_int, _ := strconv.Atoi(il8n.Data["game_id"].(string))
+		this.GameId = int32(GameId_int)
+		this.account_log_max, _ = strconv.ParseInt(il8n.Data["account_log_max"].(string), 10, 64)
+		this.ServerAddress = il8n.Data["server_address"].(string)
+		this.Server2AccountAddress = il8n.Data["server_2_accont_address"].(string)
+		this.ServerNoteAddress = il8n.Data["server_note_address"].(string)
+		this.DistanceTime, _ = strconv.Atoi(il8n.Data["distance_time"].(string))
+		this.mysql_address = il8n.Data["mysql_user"].(string) + ":" + il8n.Data["mysql_pwd"].(string) + "@tcp(" + il8n.Data["mysql_ip"].(string) + ":" + il8n.Data["mysql_port"].(string) + ")/" + il8n.Data["mysql_db"].(string) + "?charset=utf8"
 	} else {
 		Log.Error(err.Error())
 	}
 }
 
-func dbConfig() {
+func (this *Config) dbConfig() {
 	// set default database
-	err := orm.RegisterDataBase("default", "mysql", mysql_address)
+	err := orm.RegisterDataBase("default", "mysql", this.mysql_address)
 	if err != nil {
 		Log.Error(err.Error())
 	}
@@ -68,7 +71,4 @@ func dbConfig() {
 	// create table
 	orm.RunSyncdb("default", false, true)
 	O = orm.NewOrm()
-
-	fmt.Println("come here now2222")
-	NoteGame(1)
 }

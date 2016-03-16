@@ -1,23 +1,30 @@
 package main
 
 import (
-	"server/loginServer/account"
-	//"server/share/protocol"
-)
-
-import (
 	"fmt"
 	"net"
-	"sync"
+	"server/loginServer/account"
 )
 
-var gameConnects map[string]account.Connect4C //key: "127.0.0.1:2422"
 var end = make(chan int)
-var accountMutex *sync.RWMutex
+var config *account.Config
+var account_info *account.AccountInfo
+var deal_4g *Deal4G
+var deal_4c *Deal4C
 
 func init() {
-	gameConnects = make(map[string]account.Connect4C)
-	accountMutex = new(sync.RWMutex)
+	config = new(account.Config)
+	config.Init()
+
+	account_info = new(account.AccountInfo)
+	account_info.Init(config)
+
+	deal_4g = new(Deal4G)
+	deal_4g.Init(config)
+
+	deal_4c = new(Deal4C)
+	deal_4c.Init(account_info, deal_4g)
+
 }
 
 func CheckError(err error) bool {
@@ -31,16 +38,16 @@ func CheckError(err error) bool {
 func main() {
 
 	//Deal4Client
-	listener, err := net.Listen("tcp", account.Listen4CAddress)
+	listener, err := net.Listen("tcp", config.Listen4CAddress)
 
 	//Deal4Game
-	listener2, err2 := net.Listen("tcp", account.Listen4GameAddress)
+	listener2, err2 := net.Listen("tcp", config.Listen4GameAddress)
 
 	if !CheckError(err) || !CheckError(err2) {
 		return
 	}
 
-	go Deal4Client(listener)
-	go Deal4GameServer(listener2)
+	go deal_4c.Deal4Client(listener)
+	go deal_4g.Deal4GameServer(listener2)
 	<-end
 }

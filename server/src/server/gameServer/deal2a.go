@@ -8,22 +8,35 @@ import (
 	"server/share/protocol"
 )
 
-func send2AccountMenber() {
-	server_count += 1
+type Deal2A struct {
+	config  *game.Config
+	gameMsg *game.GameMsg
+	server_count int32
+}
+
+func (this *Deal2A) Init(config *game.Config, gameMsg *game.GameMsg) {
+	this.config = config
+	this.gameMsg = gameMsg
+	server_count = 0
+}
+
+func (this *Deal2A) send2AccountMenber() {
+	this.server_count += 1
 	pid := protocol.AccountMsgID_Msg_GameResult
 	result2A := &protocol.Account_GameResult{
 		Pid:         &(pid),
-		Count:       proto.Int32(server_count),
-		GameAddress: proto.String(game.ServerNoteAddress),
+		Count:       proto.Int32(this.server_count),
+		GameAddress: proto.String(this.config.ServerNoteAddress),
 	}
 
+	fmt.Println("result2A = ", result2A)
 	encObj, _ := proto.Marshal(result2A)
 	conn2a.Write(encObj)
-	game.Log.Info("send 2 Account message")
+
 }
 
 //注册完成 账号服务器通知game服务器
-func Handler2A(conn net.Conn) {
+func (this *Deal2A) Handler2A(conn net.Conn) {
 	defer conn.Close()
 	const MAXLEN = 1024
 	buf := make([]byte, MAXLEN)
@@ -44,14 +57,12 @@ func Handler2A(conn net.Conn) {
 			continue
 		}
 
-		fmt.Println("*typeStruct.Pid:", *typeStruct.Pid)
 		switch *typeStruct.Pid {
 		case protocol.AccountMsgID_Msg_NoteGame: //账号服务器登陆成功后往 game服务器写入 playerid sn
-			fmt.Println("come here now")
 			get_note := new(protocol.Account_NoteGame)
 			if err := proto.Unmarshal(buf[0:n], get_note); err == nil {
 				player_id := get_note.GetPlayerId()
-				game.NoteGame(player_id)
+				this.gameMsg.NoteGame(player_id)
 			}
 		default:
 		}

@@ -9,16 +9,26 @@ import (
 	"server/share/protocol"
 )
 
-func Deal4Client(listener net.Listener) {
+type Deal4C struct {
+	deal4g       *Deal4G
+	account_info *account.AccountInfo
+}
+
+func (this *Deal4C) Init(account_info *account.AccountInfo, deal4g *Deal4G) {
+	this.account_info = account_info
+	this.deal4g = deal4g
+}
+
+func (this *Deal4C) Deal4Client(listener net.Listener) {
 	for {
 		conn, err := listener.Accept()
 		if CheckError(err) {
-			go Handler4C(conn)
+			go this.Handler4C(conn)
 		}
 	}
 }
 
-func Handler4C(conn net.Conn) {
+func (this *Deal4C) Handler4C(conn net.Conn) {
 	defer conn.Close()
 	const MAXLEN = 1024
 	buf := make([]byte, MAXLEN)
@@ -41,12 +51,15 @@ func Handler4C(conn net.Conn) {
 			continue
 		}
 
+		fmt.Println(typeStruct)
+
 		switch *typeStruct.Pid {
 		case protocol.AccountMsgID_Msg_LoginInfo:
 			//登陆
 			login := new(protocol.Account_LoginInfo)
 			if err := proto.Unmarshal(buf[0:n], login); err == nil {
-				result, player_id, server_address := account.VerifyLogin(login.GetPlayername(), login.GetPassworld())
+				result, player_id, server_address := this.account_info.VerifyLogin(login.GetPlayername(), login.GetPassworld())
+
 				//发送登陆并断开连接
 				pid := protocol.AccountMsgID_Msg_LoginResult
 				result4C := &protocol.Account_LoginResult{
@@ -59,15 +72,14 @@ func Handler4C(conn net.Conn) {
 				encObj, _ := proto.Marshal(result4C)
 				conn.Write(encObj)
 				conn.Close()
-				account.Log.Info("send login message")
 			}
 
 		case protocol.AccountMsgID_Msg_RegisterPlayer:
 			//注册
 			register := new(protocol.Account_RegisterPlayer)
 			if err := proto.Unmarshal(buf[0:n], register); err == nil {
-				game_id, _, _ := getNewAddress()
-				result, player_id := account.Register(register.GetPlayername(), register.GetPassworld(), game_id)
+				game_id, _, _ := this.deal4g.getNewAddress()
+				result, player_id := this.account_info.Register(register.GetPlayername(), register.GetPassworld(), game_id)
 
 				pid := protocol.AccountMsgID_Msg_RegisterResult
 				result4C := &protocol.Account_RegisterResult{
@@ -81,7 +93,7 @@ func Handler4C(conn net.Conn) {
 
 				//通知game注册成功
 				if global.REGISTERSUCCESS == result {
-					NoteGame(player_id, game_id)
+					this.deal4g.NoteGame(player_id, game_id)
 				}
 
 			}
@@ -89,24 +101,4 @@ func Handler4C(conn net.Conn) {
 		default:
 		}
 	}
-}
-
-func NoteGame(player_id int32, game_id string) {
-	fmt.Println(player_id, game_id)
-
-	pid := protocol.AccountMsgID_Msg_NoteGame
-	result4G := &protocol.Account_NoteGame{
-		Pid:      &pid,
-		PlayerId: proto.Int32(player_id),
-	}
-
-	encObj, _ := proto.Marshal(result4G)
-
-	server_address := account.NewServerAddress[game_id]
-	fmt.Println(server_address)
-	if _, ok := gameConnects[server_address]; ok {
-		fmt.Println("come here now")
-		gameConnects[server_address].Conn.Write(encObj)
-	}
-
 }

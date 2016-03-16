@@ -7,45 +7,64 @@ import (
 	"net"
 	"server/loginServer/account"
 	"server/share/protocol"
+	"sync"
 )
 
-func getNewAddress() (key string, value string, err error) {
-	accountMutex.Lock()
-	defer accountMutex.Unlock()
+type Connect4C struct {
+	Address string
+	Count   int32
+	Conn    net.Conn
+}
+
+type Deal4G struct {
+	gameConnects map[string]Connect4C //key: "127.0.0.1:2422"
+	config       *account.Config
+	deal4gMutex  *sync.RWMutex
+}
+
+func (this *Deal4G) Init(config *account.Config) {
+	this.gameConnects = make(map[string]Connect4C)
+	this.deal4gMutex = new(sync.RWMutex)
+	this.config = config
+}
+
+func (this *Deal4G) getNewAddress() (key string, value string, err error) {
+	this.deal4gMutex.Lock()
+	defer this.deal4gMutex.Unlock()
 
 	var address string = ""
 	var max_count int32 = 99999
 	var address_id string = ""
-	if len(account.NewServerAddress) == 0 {
+	
+	fmt.Println("getNewAddress()")
+	fmt.Println("getNewAddress() len = ",len(this.config.NewServerAddress))
+	if len(this.config.NewServerAddress) == 0 {
 		account.Log.Error("account.NewServerAddress len = 0")
 		return "", "", errors.New("account.NewServerAddress len = 0")
 	}
-	for key, v := range account.NewServerAddress {
-		if gameConnects[v].Count <= max_count {
+	for key, v := range this.config.NewServerAddress {
+		if this.gameConnects[v].Count <= max_count {
 			address_id = key
-			address = gameConnects[v].Address
-			max_count = gameConnects[v].Count
+			address = this.gameConnects[v].Address
+			max_count = this.gameConnects[v].Count
 		}
-
 	}
 	return address_id, address, nil
 }
 
-func Handler4Game(conn net.Conn) {
+func (this *Deal4G) Handler4Game(conn net.Conn) {
 	//game与账号服务器断开
 	defer func() {
 		var key string = ""
-		for k, v := range gameConnects {
+		for k, v := range this.gameConnects {
 			if v.Conn == conn {
 				key = k
 				fmt.Println(key, v)
 				break
 			}
 		}
-		delete(gameConnects, key)
+		delete(this.gameConnects, key)
 		conn.Close()
-
-		fmt.Println("come here now gameConnects.len = ", len(gameConnects), "key = ", key)
 
 	}()
 
@@ -75,22 +94,38 @@ func Handler4Game(conn net.Conn) {
 			get_account := new(protocol.Account_GameResult)
 			if err := proto.Unmarshal(buf[0:n], get_account); err == nil {
 				key := get_account.GetGameAddress()
-				gameConnects[key] = account.Connect4C{get_account.GetGameAddress(), get_account.GetCount(), conn}
-				account.Log.Info("get account message")
+				this.gameConnects[key] = Connect4C{get_account.GetGameAddress(), get_account.GetCount(), conn}
 			}
 
 		default:
 		}
 	}
-
 }
 
-func Deal4GameServer(listener net.Listener) {
+func (this *Deal4G) Deal4GameServer(listener net.Listener) {
 	for {
 		conn, err := listener.Accept()
+		fmt.Println(conn.RemoteAddr().String(), " connet")
 		if CheckError(err) {
-			go Handler4Game(conn)
+			go this.Handler4Game(conn)
 		}
 	}
+}
 
+func (this *Deal4G) NoteGame(player_id int32, game_id string) {
+	fmt.Println(player_id, game_id)
+
+	pid := protocol.AccountMsgID_Msg_NoteGame
+	result4G := &protocol.Account_NoteGame{
+		Pid:      &pid,
+		PlayerId: proto.Int32(player_id),
+	}
+
+	encObj, _ := proto.Marshal(result4G)
+
+	server_address := this.config.NewServerAddress[game_id]
+	fmt.Println(server_address)
+	if _, ok := this.gameConnects[server_address]; ok {
+		this.gameConnects[server_address].Conn.Write(encObj)
+	}
 }

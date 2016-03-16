@@ -8,7 +8,14 @@ import (
 	"server/share/protocol"
 )
 
-func Handler4C(conn net.Conn) {
+type Deal4C struct {
+}
+
+func (this *Deal4C) Init() {
+
+}
+
+func (this *Deal4C) Handler4C(conn net.Conn) {
 	defer conn.Close()
 	const MAXLEN = 1024
 	buf := make([]byte, MAXLEN)
@@ -43,11 +50,11 @@ func Handler4C(conn net.Conn) {
 	}
 }
 
-func Deal4Client(listener net.Listener) {
+func (this *Deal4C) Deal4Client(listener net.Listener) {
 	for {
 		conn, err := listener.Accept()
 		if CheckError(err) {
-			go Handler4C(conn)
+			go this.Handler4C(conn)
 		}
 	}
 

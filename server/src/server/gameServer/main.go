@@ -10,12 +10,25 @@ import (
 	"net"
 )
 
-var conn2a net.Conn
-var server_count int32 = 0
+var conn2a net.Conn //连接账号服务器
 var end = make(chan int)
+var config *game.Config
+var gameMsg *game.GameMsg
+var deal_2a *Deal2A
+var deal_4c *Deal4C
 
 func init() {
-	server_count = 0
+	config = new(game.Config)
+	config.Init()
+
+	gameMsg = new(game.GameMsg)
+	gameMsg.Init(config)
+
+	deal_2a = new(Deal2A)
+	deal_2a.Init(config, gameMsg)
+
+	deal_4c = new(Deal4C)
+	deal_4c.Init()
 }
 
 func CheckError(err error) bool {
@@ -29,20 +42,19 @@ func CheckError(err error) bool {
 func main() {
 	//连接账号服务器
 	var err error
-	conn2a, err = net.Dial("tcp", game.Server2AccountAddress)
+	conn2a, err = net.Dial("tcp", config.Server2AccountAddress)
 	if CheckError(err) {
 		//定时告诉账号服务器当前人数
-		send2AccountMenber()
-		timer.CreateTimer(game.DistanceTime, true, send2AccountMenber)
-		go Handler2A(conn2a)
-		fmt.Println("come here Handler2A")
+		deal_2a.send2AccountMenber()
+		timer.CreateTimer(config.DistanceTime, true, deal_2a.send2AccountMenber)
+
+		go deal_2a.Handler2A(conn2a)
 	}
 
 	//监听玩家连接
-	fmt.Println("come here Deal4Client")
-	listener1, err1 := net.Listen("tcp", game.ServerAddress)
+	listener1, err1 := net.Listen("tcp", config.ServerAddress)
 	if CheckError(err1) {
-		go Deal4Client(listener1)
+		go deal_4c.Deal4Client(listener1)
 	}
 
 	<-end
