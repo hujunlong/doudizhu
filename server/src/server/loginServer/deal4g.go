@@ -35,9 +35,7 @@ func (this *Deal4G) getNewAddress() (key string, value string, err error) {
 	var address string = ""
 	var max_count int32 = 99999
 	var address_id string = ""
-	
-	fmt.Println("getNewAddress()")
-	fmt.Println("getNewAddress() len = ",len(this.config.NewServerAddress))
+
 	if len(this.config.NewServerAddress) == 0 {
 		account.Log.Error("account.NewServerAddress len = 0")
 		return "", "", errors.New("account.NewServerAddress len = 0")
@@ -56,10 +54,8 @@ func (this *Deal4G) Handler4Game(conn net.Conn) {
 	//game与账号服务器断开
 	defer func() {
 		var key string = ""
-		for k, v := range this.gameConnects {
+		for _, v := range this.gameConnects {
 			if v.Conn == conn {
-				key = k
-				fmt.Println(key, v)
 				break
 			}
 		}
@@ -112,9 +108,7 @@ func (this *Deal4G) Deal4GameServer(listener net.Listener) {
 	}
 }
 
-func (this *Deal4G) NoteGame(player_id int32, game_id string) {
-	fmt.Println(player_id, game_id)
-
+func (this *Deal4G) NoteGame(player_id int32, game_id string) error {
 	pid := protocol.AccountMsgID_Msg_NoteGame
 	result4G := &protocol.Account_NoteGame{
 		Pid:      &pid,
@@ -122,10 +116,11 @@ func (this *Deal4G) NoteGame(player_id int32, game_id string) {
 	}
 
 	encObj, _ := proto.Marshal(result4G)
-
 	server_address := this.config.NewServerAddress[game_id]
-	fmt.Println(server_address)
+
 	if _, ok := this.gameConnects[server_address]; ok {
-		this.gameConnects[server_address].Conn.Write(encObj)
+		_, err := this.gameConnects[server_address].Conn.Write(encObj)
+		return err
 	}
+	return errors.New("game connect error")
 }

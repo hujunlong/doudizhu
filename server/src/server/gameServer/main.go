@@ -41,6 +41,7 @@ func CheckError(err error) bool {
 
 func main() {
 	//连接账号服务器
+
 	var err error
 	conn2a, err = net.Dial("tcp", config.Server2AccountAddress)
 	if CheckError(err) {
@@ -48,6 +49,7 @@ func main() {
 		deal_2a.send2AccountMenber()
 		timer.CreateTimer(config.DistanceTime, true, deal_2a.send2AccountMenber)
 
+		//接收account服务器发来的消息
 		go deal_2a.Handler2A(conn2a)
 	}
 

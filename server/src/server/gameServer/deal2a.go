@@ -1,23 +1,25 @@
 package main
 
 import (
-	"fmt"
+	//"fmt"
 	"github.com/golang/protobuf/proto"
 	"net"
 	"server/gameServer/game"
 	"server/share/protocol"
+	"sync"
 )
 
 type Deal2A struct {
-	config  *game.Config
-	gameMsg *game.GameMsg
+	config       *game.Config
+	gameMsg      *game.GameMsg
 	server_count int32
+	gameMutex    *sync.RWMutex
 }
 
 func (this *Deal2A) Init(config *game.Config, gameMsg *game.GameMsg) {
 	this.config = config
 	this.gameMsg = gameMsg
-	server_count = 0
+	this.server_count = 0
 }
 
 func (this *Deal2A) send2AccountMenber() {
@@ -29,10 +31,22 @@ func (this *Deal2A) send2AccountMenber() {
 		GameAddress: proto.String(this.config.ServerNoteAddress),
 	}
 
-	fmt.Println("result2A = ", result2A)
 	encObj, _ := proto.Marshal(result2A)
 	conn2a.Write(encObj)
 
+}
+
+func (this *Deal2A) thisTask(pid protocol.AccountMsgID, buf []byte, n int) {
+	switch pid {
+	case protocol.AccountMsgID_Msg_NoteGame: //账号服务器登陆成功后往 game服务器写入 playerid sn
+		get_note := new(protocol.Account_NoteGame)
+		if err := proto.Unmarshal(buf[0:n], get_note); err == nil {
+			player_id := get_note.GetPlayerId()
+			game.Log.Info("player_id = %d", player_id)
+			//this.gameMsg.NoteGame(player_id)
+		}
+	default:
+	}
 }
 
 //注册完成 账号服务器通知game服务器
@@ -57,14 +71,6 @@ func (this *Deal2A) Handler2A(conn net.Conn) {
 			continue
 		}
 
-		switch *typeStruct.Pid {
-		case protocol.AccountMsgID_Msg_NoteGame: //账号服务器登陆成功后往 game服务器写入 playerid sn
-			get_note := new(protocol.Account_NoteGame)
-			if err := proto.Unmarshal(buf[0:n], get_note); err == nil {
-				player_id := get_note.GetPlayerId()
-				this.gameMsg.NoteGame(player_id)
-			}
-		default:
-		}
+		go this.thisTask(*typeStruct.Pid, buf, n)
 	}
 }

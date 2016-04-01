@@ -16,7 +16,7 @@ import (
 
 var log *logs.BeeLogger
 
-const max_client = 1
+const max_client = 100000
 
 var end = make(chan int)
 
@@ -140,7 +140,7 @@ func main() {
 			time.Sleep(100 * time.Millisecond)
 		} else {
 			go MessageRun(arrayConnStruct[i].conn, i)
-			time.Sleep(5 * time.Millisecond)
+			time.Sleep(10 * time.Millisecond)
 			i++
 		}
 

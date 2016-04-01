@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+//	"fmt"
 	"github.com/golang/protobuf/proto"
 	"net"
 	"server/loginServer/account"
@@ -51,8 +51,6 @@ func (this *Deal4C) Handler4C(conn net.Conn) {
 			continue
 		}
 
-		fmt.Println(typeStruct)
-
 		switch *typeStruct.Pid {
 		case protocol.AccountMsgID_Msg_LoginInfo:
 			//登陆
@@ -93,7 +91,11 @@ func (this *Deal4C) Handler4C(conn net.Conn) {
 
 				//通知game注册成功
 				if global.REGISTERSUCCESS == result {
-					this.deal4g.NoteGame(player_id, game_id)
+					err := this.deal4g.NoteGame(player_id, game_id)
+					if err != nil {
+						account.Log.Error("err:", err)
+					}
+					account.Log.Info("player_id = %d game_id=%d", player_id, game_id)
 				}
 
 			}
