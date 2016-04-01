@@ -33,14 +33,11 @@ func (this *AccountInfo) Register(name string, pwd string, server_id string) (in
 
 		//内存数据库
 		err_redis := redis.Add("PlayerName:"+name, user)
-		//mysql
-		_, err_mysql := O.Insert(&user)
 
-		if err_redis == nil && err_mysql == nil {
+		if err_redis == nil {
 			return global.REGISTERSUCCESS, this.config.count
 		} else {
 			redis.Del("PlayerName:" + name)
-			O.Delete(&user)
 		}
 	}
 

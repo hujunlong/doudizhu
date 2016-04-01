@@ -140,7 +140,7 @@ func main() {
 			time.Sleep(100 * time.Millisecond)
 		} else {
 			go MessageRun(arrayConnStruct[i].conn, i)
-			time.Sleep(10 * time.Millisecond)
+			time.Sleep(5 * time.Millisecond)
 			i++
 		}
 

@@ -6,14 +6,12 @@ import (
 	"net"
 	"server/gameServer/game"
 	"server/share/protocol"
-	"sync"
 )
 
 type Deal2A struct {
 	config       *game.Config
 	gameMsg      *game.GameMsg
 	server_count int32
-	gameMutex    *sync.RWMutex
 }
 
 func (this *Deal2A) Init(config *game.Config, gameMsg *game.GameMsg) {
@@ -43,7 +41,7 @@ func (this *Deal2A) thisTask(pid protocol.AccountMsgID, buf []byte, n int) {
 		if err := proto.Unmarshal(buf[0:n], get_note); err == nil {
 			player_id := get_note.GetPlayerId()
 			game.Log.Info("player_id = %d", player_id)
-			//this.gameMsg.NoteGame(player_id)
+			this.gameMsg.NoteGame(player_id)
 		}
 	default:
 	}
