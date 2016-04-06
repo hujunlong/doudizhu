@@ -1,7 +1,6 @@
 package main
 
 import (
-//	"fmt"
 	"github.com/golang/protobuf/proto"
 	"net"
 	"server/loginServer/account"
@@ -62,8 +61,8 @@ func (this *Deal4C) Handler4C(conn net.Conn) {
 				pid := protocol.AccountMsgID_Msg_LoginResult
 				result4C := &protocol.Account_LoginResult{
 					Pid:        &pid,
-					Result:     proto.Int32(result),
-					PlayerId:   proto.Int32(player_id),
+					Result:     proto.Int32(int32(result)),
+					PlayerId:   proto.Int32(int32(player_id)),
 					Gameserver: proto.String(server_address),
 				}
 
@@ -82,7 +81,7 @@ func (this *Deal4C) Handler4C(conn net.Conn) {
 				pid := protocol.AccountMsgID_Msg_RegisterResult
 				result4C := &protocol.Account_RegisterResult{
 					Pid:    &pid,
-					Result: proto.Int32(result),
+					Result: proto.Int32(int32(result)),
 				}
 
 				encObj, _ := proto.Marshal(result4C)
@@ -90,6 +89,7 @@ func (this *Deal4C) Handler4C(conn net.Conn) {
 				account.Log.Info("send register message")
 
 				//通知game注册成功
+
 				if global.REGISTERSUCCESS == result {
 					err := this.deal4g.NoteGame(player_id, game_id)
 					if err != nil {

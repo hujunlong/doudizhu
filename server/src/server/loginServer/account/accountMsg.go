@@ -19,7 +19,7 @@ func (this *AccountInfo) Init(config *Config) {
 	this.config = config
 }
 
-func (this *AccountInfo) Register(name string, pwd string, server_id string) (int32, int32) {
+func (this *AccountInfo) Register(name string, pwd string, server_id string) (int, int) {
 	this.accountMutex.Lock()
 	defer this.accountMutex.Unlock()
 
@@ -33,11 +33,14 @@ func (this *AccountInfo) Register(name string, pwd string, server_id string) (in
 
 		//内存数据库
 		err_redis := redis.Add("PlayerName:"+name, user)
+		//mysql
+		_, err_mysql := O.Insert(&user)
 
-		if err_redis == nil {
+		if err_redis == nil && err_mysql == nil {
 			return global.REGISTERSUCCESS, this.config.count
 		} else {
 			redis.Del("PlayerName:" + name)
+			O.Delete(&user)
 		}
 	}
 
@@ -45,15 +48,11 @@ func (this *AccountInfo) Register(name string, pwd string, server_id string) (in
 	return global.SAMENICK, 0
 }
 
-func (this *AccountInfo) VerifyLogin(name string, pwd string) (result int32, player_id int32, game_address string) {
-	this.accountMutex.Lock()
-	defer this.accountMutex.Unlock()
-
-	//读取内存数据
+func (this *AccountInfo) VerifyLogin(name string, pwd string) (result int, player_id int, game_address string) {
 	redis_login_base := new(LoginBase)
 	err := redis.Find("PlayerName:"+name, redis_login_base)
 	if err == nil {
-		if strings.EqualFold(redis_login_base.PlayerName, name) && strings.EqualFold(redis_login_base.PlayerPwd, pwd) && redis_login_base.IsForBid {
+		if strings.EqualFold(redis_login_base.PlayerName, name) && strings.EqualFold(redis_login_base.PlayerPwd, pwd) && !redis_login_base.IsForBid {
 			if v, ok := il8n.Data[redis_login_base.ServerId]; ok {
 				return global.LOGINSUCCESS, redis_login_base.PlayerId, v.(string)
 			} else {

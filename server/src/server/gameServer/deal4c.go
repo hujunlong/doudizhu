@@ -9,10 +9,11 @@ import (
 )
 
 type Deal4C struct {
+	players map[string]*game.Player //世界内玩家指针 map
 }
 
 func (this *Deal4C) Init() {
-
+	world = new(World)
 }
 
 func (this *Deal4C) Handler4C(conn net.Conn) {
@@ -39,11 +40,12 @@ func (this *Deal4C) Handler4C(conn net.Conn) {
 		}
 
 		switch *typeStruct.Pid {
-		case protocol.GameMsgID_Game_Msg_RegisterRole:
-			//注册
+		case protocol.GameMsgID_Game_Msg_RegisterRole: //注册
 			register := new(protocol.Game_RegisterRole)
 			if err := proto.Unmarshal(buf[0:n], register); err == nil {
 				//game.loginGameServer()
+				player := new(game.Player)
+				player.Conn = &conn
 			}
 		default:
 		}

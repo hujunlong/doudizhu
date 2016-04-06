@@ -4,24 +4,24 @@ enum AccountMsgID
 {
 	//客户端与账号服务器之间的数据
 	Msg_GetType = 0;
-	Msg_RegisterPlayer = 1;
-	Msg_RegisterResult = 2;
-	Msg_LoginInfo = 3;
-	Msg_LoginResult = 4;
+	Msg_RegisterPlayer = 1;//注册玩家请求
+	Msg_RegisterResult = 2;//注册结果
+	Msg_LoginInfo = 3;//登陆请求
+	Msg_LoginResult = 4;//登陆结果
 	
 	//账号服务器与游戏服务器之间的通信
-	Msg_GetGameAccount = 100;
-	Msg_GameResult = 101;
+	Msg_GetGameAccount = 100;//获取Game游戏服务器的人数
+	Msg_GameResult = 101;//返回Game在线人数人数
 	Msg_NoteGame = 102;//通知游戏服务器玩家注册成功
 }
 
 enum GameMsgID
 {
 	Game_Msg_GetType = 1000;
-	Game_Msg_RegisterRole = 1001;
-	Game_Msg_RegisterRoleResult = 1002;
-	Game_Msg_GetRoleInfo = 1003;
-	Game_Msg_RoleInfoResult = 1004;
+	Game_Msg_RegisterRole = 1001;//注册具体角色
+	Game_Msg_RegisterRoleResult = 1002;//角色返回
+	Game_Msg_GetRoleInfo = 1003;//角色请求
+	Game_Msg_RoleInfoResult = 1004;//角色返回
 }
 
 message Account {
@@ -79,12 +79,13 @@ message Game {
 	}
 	
 	message BaseRole {
-		required int32 nick = 1;
-		required int32 sex = 2;
+		required int32 player_id = 1;//玩家的id
+		required int32 name = 2;//玩家名字
+		required bool gender = 3;//性别 true:男 false:女
 	}
 		
 	message RegisterRole {
-		optional GameMsgID GameMsgID = 1 [default = Game_Msg_RegisterRole];
+		optional GameMsgID pid = 1 [default = Game_Msg_RegisterRole];
 		optional BaseRole info = 2;
 	}
 	
@@ -105,7 +106,7 @@ message Game {
 	
 	message RoleInfoResult{
 		optional GameMsgID pid = 1 [default = Game_Msg_RoleInfoResult];
-		optional RoleInfo role = 2; 
+		optional RoleInfo role_info = 2; 
 	}
 	
 }

@@ -15,7 +15,7 @@ var O orm.Ormer
 var Log *logs.BeeLogger
 
 type Config struct {
-	count              int32 //现在最大的playerid
+	count              int //现在最大的playerid
 	account_log_max    int64
 	Listen4CAddress    string
 	Listen4GameAddress string
@@ -76,7 +76,7 @@ func (this *Config) dbConfig() {
 	O = orm.NewOrm()
 }
 
-func (this *Config) getMaxId() int32 {
+func (this *Config) getMaxId() int {
 	var count int = 0
 	var maps []orm.Params
 	num, err := O.Raw("select max(player_id) from login_base").Values(&maps)
@@ -86,5 +86,5 @@ func (this *Config) getMaxId() int32 {
 			count, _ = strconv.Atoi(buff)
 		}
 	}
-	return int32(count)
+	return count
 }

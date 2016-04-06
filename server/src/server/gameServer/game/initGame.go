@@ -22,7 +22,7 @@ type Config struct {
 	ServerAddress         string
 	Server2AccountAddress string
 	ServerNoteAddress     string
-	GameId                int32
+	GameId                int
 	DistanceTime          int
 }
 
@@ -45,8 +45,8 @@ func (this *Config) readConfig() {
 	err := il8n.GetInit("config/game_cfg.ini")
 	if err == nil {
 
-		GameId_int, _ := strconv.Atoi(il8n.Data["game_id"].(string))
-		this.GameId = int32(GameId_int)
+		this.GameId, _ = strconv.Atoi(il8n.Data["game_id"].(string))
+		
 		this.account_log_max, _ = strconv.ParseInt(il8n.Data["account_log_max"].(string), 10, 64)
 		this.ServerAddress = il8n.Data["server_address"].(string)
 		this.Server2AccountAddress = il8n.Data["server_2_accont_address"].(string)
@@ -66,7 +66,7 @@ func (this *Config) dbConfig() {
 	}
 
 	// register model
-	orm.RegisterModel(new(Role))
+	orm.RegisterModel(new(Player_Rank))
 
 	// create table
 	orm.RunSyncdb("default", false, true)

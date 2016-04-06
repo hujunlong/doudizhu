@@ -11,6 +11,11 @@ func init() {
 	redis_ = new(Client)
 }
 
+type Role struct {
+	Name string
+	Gold int32
+}
+
 func Add(key string, inter interface{}) error {
 	buf := bytes.NewBuffer(nil)
 	enc := gob.NewEncoder(buf)
@@ -50,4 +55,9 @@ func Incr(key string) (int64, error) {
 func Del(key string) (bool, error) {
 	ok, err := redis_.Del(key)
 	return ok, err
+}
+
+func Exists(key string) (bool, error) {
+	result, err := redis_.Exists(key)
+	return result, err
 }

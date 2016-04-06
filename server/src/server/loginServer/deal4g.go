@@ -12,7 +12,7 @@ import (
 
 type Connect4C struct {
 	Address string
-	Count   int32
+	Count   int
 	Conn    net.Conn
 }
 
@@ -33,7 +33,7 @@ func (this *Deal4G) getNewAddress() (key string, value string, err error) {
 	defer this.deal4gMutex.Unlock()
 
 	var address string = ""
-	var max_count int32 = 99999
+	var max_count int = 99999
 	var address_id string = ""
 
 	if len(this.config.NewServerAddress) == 0 {
@@ -90,7 +90,7 @@ func (this *Deal4G) Handler4Game(conn net.Conn) {
 			get_account := new(protocol.Account_GameResult)
 			if err := proto.Unmarshal(buf[0:n], get_account); err == nil {
 				key := get_account.GetGameAddress()
-				this.gameConnects[key] = Connect4C{get_account.GetGameAddress(), get_account.GetCount(), conn}
+				this.gameConnects[key] = Connect4C{get_account.GetGameAddress(), int(get_account.GetCount()), conn}
 			}
 
 		default:
@@ -108,11 +108,11 @@ func (this *Deal4G) Deal4GameServer(listener net.Listener) {
 	}
 }
 
-func (this *Deal4G) NoteGame(player_id int32, game_id string) error {
+func (this *Deal4G) NoteGame(player_id int, game_id string) error {
 	pid := protocol.AccountMsgID_Msg_NoteGame
 	result4G := &protocol.Account_NoteGame{
 		Pid:      &pid,
-		PlayerId: proto.Int32(player_id),
+		PlayerId: proto.Int32(int32(player_id)),
 	}
 
 	encObj, _ := proto.Marshal(result4G)

@@ -510,7 +510,7 @@ func (m *Game_RoleInfo) GetTaskIds() []int32 {
 
 type Game_RoleInfoResult struct {
 	Pid              *GameMsgID     `protobuf:"varint,1,opt,name=pid,enum=protocol.GameMsgID,def=1004" json:"pid,omitempty"`
-	Role             *Game_RoleInfo `protobuf:"bytes,2,opt,name=role" json:"role,omitempty"`
+	RoleInfo         *Game_RoleInfo `protobuf:"bytes,2,opt,name=role_info" json:"role_info,omitempty"`
 	XXX_unrecognized []byte         `json:"-"`
 }
 
@@ -527,9 +527,9 @@ func (m *Game_RoleInfoResult) GetPid() GameMsgID {
 	return Default_Game_RoleInfoResult_Pid
 }
 
-func (m *Game_RoleInfoResult) GetRole() *Game_RoleInfo {
+func (m *Game_RoleInfoResult) GetRoleInfo() *Game_RoleInfo {
 	if m != nil {
-		return m.Role
+		return m.RoleInfo
 	}
 	return nil
 }
