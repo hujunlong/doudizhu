@@ -13,7 +13,7 @@ import (
 var conn2a net.Conn //连接账号服务器
 var end = make(chan int)
 var config *game.Config
-var game_player *game.Player
+
 var deal_2a *Deal2A
 var deal_4c *Deal4C
 
@@ -21,14 +21,11 @@ func init() {
 	config = new(game.Config)
 	config.Init()
 
-	game_player = new(game.Player)
-	game_player.Init(config)
-
 	deal_2a = new(Deal2A)
-	deal_2a.Init(config, game_player)
+	deal_2a.Init(config.ServerNoteAddress, config.GameId)
 
 	deal_4c = new(Deal4C)
-	deal_4c.Init()
+	deal_4c.Init(config.GameId)
 }
 
 func CheckError(err error) bool {

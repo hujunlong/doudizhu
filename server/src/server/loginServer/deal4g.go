@@ -40,6 +40,7 @@ func (this *Deal4G) getNewAddress() (key string, value string, err error) {
 		account.Log.Error("account.NewServerAddress len = 0")
 		return "", "", errors.New("account.NewServerAddress len = 0")
 	}
+
 	for key, v := range this.config.NewServerAddress {
 		if this.gameConnects[v].Count <= max_count {
 			address_id = key

@@ -383,31 +383,39 @@ func (m *Game_GetType) GetPid() GameMsgID {
 }
 
 type Game_BaseRole struct {
-	Nick             *int32 `protobuf:"varint,1,req,name=nick" json:"nick,omitempty"`
-	Sex              *int32 `protobuf:"varint,2,req,name=sex" json:"sex,omitempty"`
-	XXX_unrecognized []byte `json:"-"`
+	PlayerId         *int32  `protobuf:"varint,1,req,name=player_id" json:"player_id,omitempty"`
+	Nick             *string `protobuf:"bytes,2,req,name=nick" json:"nick,omitempty"`
+	Gender           *bool   `protobuf:"varint,3,req,name=gender" json:"gender,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
 }
 
 func (m *Game_BaseRole) Reset()         { *m = Game_BaseRole{} }
 func (m *Game_BaseRole) String() string { return proto.CompactTextString(m) }
 func (*Game_BaseRole) ProtoMessage()    {}
 
-func (m *Game_BaseRole) GetNick() int32 {
+func (m *Game_BaseRole) GetPlayerId() int32 {
+	if m != nil && m.PlayerId != nil {
+		return *m.PlayerId
+	}
+	return 0
+}
+
+func (m *Game_BaseRole) GetNick() string {
 	if m != nil && m.Nick != nil {
 		return *m.Nick
 	}
-	return 0
+	return ""
 }
 
-func (m *Game_BaseRole) GetSex() int32 {
-	if m != nil && m.Sex != nil {
-		return *m.Sex
+func (m *Game_BaseRole) GetGender() bool {
+	if m != nil && m.Gender != nil {
+		return *m.Gender
 	}
-	return 0
+	return false
 }
 
 type Game_RegisterRole struct {
-	GameMsgID        *GameMsgID     `protobuf:"varint,1,opt,enum=protocol.GameMsgID,def=1001" json:"GameMsgID,omitempty"`
+	Pid              *GameMsgID     `protobuf:"varint,1,opt,name=pid,enum=protocol.GameMsgID,def=1001" json:"pid,omitempty"`
 	Info             *Game_BaseRole `protobuf:"bytes,2,opt,name=info" json:"info,omitempty"`
 	XXX_unrecognized []byte         `json:"-"`
 }
@@ -416,13 +424,13 @@ func (m *Game_RegisterRole) Reset()         { *m = Game_RegisterRole{} }
 func (m *Game_RegisterRole) String() string { return proto.CompactTextString(m) }
 func (*Game_RegisterRole) ProtoMessage()    {}
 
-const Default_Game_RegisterRole_GameMsgID GameMsgID = GameMsgID_Game_Msg_RegisterRole
+const Default_Game_RegisterRole_Pid GameMsgID = GameMsgID_Game_Msg_RegisterRole
 
-func (m *Game_RegisterRole) GetGameMsgID() GameMsgID {
-	if m != nil && m.GameMsgID != nil {
-		return *m.GameMsgID
+func (m *Game_RegisterRole) GetPid() GameMsgID {
+	if m != nil && m.Pid != nil {
+		return *m.Pid
 	}
-	return Default_Game_RegisterRole_GameMsgID
+	return Default_Game_RegisterRole_Pid
 }
 
 func (m *Game_RegisterRole) GetInfo() *Game_BaseRole {

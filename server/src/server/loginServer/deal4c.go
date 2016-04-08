@@ -89,7 +89,6 @@ func (this *Deal4C) Handler4C(conn net.Conn) {
 				account.Log.Info("send register message")
 
 				//通知game注册成功
-
 				if global.REGISTERSUCCESS == result {
 					err := this.deal4g.NoteGame(player_id, game_id)
 					if err != nil {

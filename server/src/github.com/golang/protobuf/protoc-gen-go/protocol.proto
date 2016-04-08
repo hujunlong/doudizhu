@@ -80,7 +80,7 @@ message Game {
 	
 	message BaseRole {
 		required int32 player_id = 1;//玩家的id
-		required int32 name = 2;//玩家名字
+		required string nick = 2;//玩家名字
 		required bool gender = 3;//性别 true:男 false:女
 	}
 		
