@@ -1,13 +1,16 @@
 package main
 
 import (
+	"bytes"
+	"encoding/binary"
 	"errors"
 	"fmt"
-	"github.com/golang/protobuf/proto"
 	"net"
 	"server/loginServer/account"
 	"server/share/protocol"
 	"sync"
+
+	"github.com/golang/protobuf/proto"
 )
 
 type Connect4C struct {
@@ -62,7 +65,6 @@ func (this *Deal4G) Handler4Game(conn net.Conn) {
 		}
 		delete(this.gameConnects, key)
 		conn.Close()
-
 	}()
 
 	const MAXLEN = 1024
@@ -78,24 +80,24 @@ func (this *Deal4G) Handler4Game(conn net.Conn) {
 			return
 		}
 
-		//接收包的type类型用来区分包之间的区别
-		typeStruct := new(protocol.Account_GetType)
-		if err1 := proto.Unmarshal(buf[0:n], typeStruct); err1 != nil {
-			CheckError(err1)
-			continue
-		}
+		var head_len int32 = 0
+		var head_pid int32 = 0
+		buffer_len := bytes.NewBuffer(buf[0:4])
+		buffer_pid := bytes.NewBuffer(buf[4:8])
+		binary.Read(buffer_len, binary.BigEndian, &head_len)
+		binary.Read(buffer_pid, binary.BigEndian, &head_pid)
 
-		switch *typeStruct.Pid {
-		case protocol.AccountMsgID_Msg_GameResult:
-			//读取各个服务器发送过来的在线人数
+		fmt.Println("head_pid", head_pid, "head_len=", head_len)
+		switch head_pid {
+		case 101:
 			get_account := new(protocol.Account_GameResult)
-			if err := proto.Unmarshal(buf[0:n], get_account); err == nil {
+			if err := proto.Unmarshal(buf[8:n], get_account); err == nil {
 				key := get_account.GetGameAddress()
 				this.gameConnects[key] = Connect4C{get_account.GetGameAddress(), int(get_account.GetCount()), conn}
 			}
-
 		default:
 		}
+
 	}
 }
 
@@ -110,9 +112,7 @@ func (this *Deal4G) Deal4GameServer(listener net.Listener) {
 }
 
 func (this *Deal4G) NoteGame(player_id int, game_id string) error {
-	pid := protocol.AccountMsgID_Msg_NoteGame
 	result4G := &protocol.Account_NoteGame{
-		Pid:      &pid,
 		PlayerId: proto.Int32(int32(player_id)),
 	}
 
@@ -120,8 +120,9 @@ func (this *Deal4G) NoteGame(player_id int, game_id string) error {
 	server_address := this.config.NewServerAddress[game_id]
 
 	if _, ok := this.gameConnects[server_address]; ok {
-		_, err := this.gameConnects[server_address].Conn.Write(encObj)
-		return err
+		SendPackage(this.gameConnects[server_address].Conn, 102, encObj)
+		fmt.Println("send to game", encObj)
+		return nil
 	}
 	return errors.New("game connect error")
 }

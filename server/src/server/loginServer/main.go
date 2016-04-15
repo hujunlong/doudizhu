@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bytes"
+	"encoding/binary"
 	"fmt"
 	"net"
 	"server/loginServer/account"
@@ -35,6 +37,22 @@ func CheckError(err error) bool {
 	return true
 }
 
+func SendPackage(conn net.Conn, pid int, body []byte) {
+	var pid_32 int32 = int32(pid)
+	len := 8 + len(body)
+	var len_32 = int32(len)
+
+	len_buf := bytes.NewBuffer([]byte{})
+	binary.Write(len_buf, binary.BigEndian, len_32)
+
+	pid_buf := bytes.NewBuffer([]byte{})
+	binary.Write(pid_buf, binary.BigEndian, pid_32)
+
+	msg := append(len_buf.Bytes(), pid_buf.Bytes()...)
+	msg2 := append(msg, body...)
+	conn.Write(msg2)
+}
+
 func main() {
 
 	//Deal4Client
@@ -49,5 +67,6 @@ func main() {
 
 	go deal_4c.Deal4Client(listener)
 	go deal_4g.Deal4GameServer(listener2)
+
 	<-end
 }

@@ -1,0 +1,44 @@
+package protocol;
+
+
+message Account {
+	
+	//客户端消息 
+	//pid = 1
+	message RegisterPlayer {
+		optional string playername = 1;
+		optional string passworld = 2;
+	}
+	
+	//pid = 1
+	message RegisterResult {
+		optional int32 result = 1;
+	}
+	
+	//pid = 2
+	message LoginInfo{
+		optional string playername = 1;  
+		optional string passworld = 2;
+	}
+
+	//pid = 2
+	message LoginResult {
+		optional int32 result = 1;
+		optional string gameserver = 2;
+		optional int32 player_id = 3;	
+	}
+	
+	
+	//发送给game消息
+	
+	//pid = 101 返回游戏服在线人数
+	message GameResult {
+		optional int32 count = 1;
+		optional string game_address = 2;
+	}
+	
+	//pid = 102
+	message NoteGame {
+		optional int32 player_id = 1;
+	}
+}

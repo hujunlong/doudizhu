@@ -1,0 +1,50 @@
+package protocol;
+
+message Game {
+
+	message BaseRole {
+		required int32 player_id = 1;//玩家的id 账号服务器返回的 player id用来验证是否合法
+		required string nick = 2;//角色昵称
+		required int32 hero_id = 3;//所选英雄id 配置表验证
+	}
+	
+	//pid = 1001	客户端发送注册角色信息
+	message RegisterRole {
+		optional BaseRole info = 1;
+	}
+	
+	//pid = 1001 服务器返回 角色注册信息
+	message RegisterRoleResult{
+		optional int32 result = 1;
+	}
+	
+	//pid = 1002 获取角色信息
+	message GetRoleInfo{
+	}
+	
+	
+	message Attribute { //属性
+		optional int32 level = 1;//等级
+		optional int32 exp = 3;//经验
+		optional int32 hp = 2;//血量
+		
+		repeated int32 physical_def = 4;//物理防御(升级 ,强化,精炼)
+		repeated int32 magic_def = 5;//法术防御
+		repeated int32 physical_damage = 6;//物理伤害
+		repeated int32 magic_damage= 7;//法术伤害
+	}
+	
+	message HangUpInfo { //挂机相关
+		optional int32 type = 1;//(1:道具 2:英雄 3:装备 4:资源)
+		optional int32 id = 2;//对应物品id
+		optional int32 count = 3;//数量
+	}
+
+	//pid = 1002 角色返回
+	message RoleInfoResult {
+		optional BaseRole base_role = 1;
+		optional Attribute attribute = 2;
+		repeated HangUpInfo hang_up_info = 3;
+	}
+	
+}
